@@ -1,15 +1,12 @@
 #!/bin/bash
 set -e
 
-# Load environment variables
-source /root/ai-agent-setup/.env
+source /root/ai-agent-setup/.env  # Load ENV paths
 
-KEYS_DIR="$CONFIG_DIR/keys"
+mkdir -p "$CONFIG_DIR/keys"
 
-mkdir -p "$KEYS_DIR"
-
-ENCRYPTED_KEY_FILE="$KEYS_DIR/api_key.enc"
-PLAIN_KEY_FILE="$KEYS_DIR/api_key.txt"
+ENCRYPTED_KEY_FILE="$CONFIG_DIR/keys/api_key.enc"
+PLAIN_KEY_FILE="$CONFIG_DIR/keys/api_key.txt"
 
 if [ -z "$1" ]; then
     echo "Usage: ./encrypt_key.sh <API_KEY>"
@@ -20,7 +17,7 @@ API_KEY=$1
 echo "$API_KEY" > "$PLAIN_KEY_FILE"
 
 echo "Encrypting API key..."
-openssl enc -aes-256-cbc -salt -in "$PLAIN_KEY_FILE" -out "$ENCRYPTED_KEY_FILE" -k "$(hostname)-key"
+openssl enc -aes-256-cbc -pbkdf2 -salt -in "$PLAIN_KEY_FILE" -out "$ENCRYPTED_KEY_FILE" -k "$(hostname)-key"
 
 echo "Encrypted API key saved to $ENCRYPTED_KEY_FILE"
 rm "$PLAIN_KEY_FILE"
