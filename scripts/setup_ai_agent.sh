@@ -47,12 +47,14 @@ if [ ! -f "$ALLOWED_IPS_FILE" ]; then
 fi
 
 while read -r ip; do
-    if [[ -n "$ip" ]] && [[ "$ip" =~ ^[0-9a-fA-F:.]+$ ]]; then
+    if [[ -n "$ip" && ("$ip" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ || "$ip" =~ ^[0-9a-fA-F:]+$) ]]; then
         sudo ufw allow from "$ip" to any port 8080
+        log_message "Added $ip to UFW rules."
     else
-        log_message "Skipping invalid IP or empty line: $ip"
+        log_message "Skipping invalid IP or empty line: '$ip'"
     fi
 done < "$ALLOWED_IPS_FILE"
+
 sudo ufw enable
 
 log_message "Starting AI Agent server..."
