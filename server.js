@@ -3,24 +3,29 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { Configuration, OpenAIApi, OpenAI } = require('openai');
-const app = express();
 const { spawn } = require('child_process');
-import { doCompletion } from './services/aiServices';
+const { OpenAIApi, OpenAI } = require('openai');
+const db = require('./server/services/dbServices'); 
+const Assistant = require('./server/models/Assistant');
+const { 
+    doCompletion, 
+    createAssistant, 
+    createThread, 
+    addMessageToThread, 
+    runThread, 
+    getThreadMessages 
+} = require('./server/services/aiServices');
+
+const app = express();
+app.use(express.json());
+
 // Paths
 const configPath = process.env.CONFIG_DIR || '/root/ai-agent-setup/config';
 const whitelistPath = `${configPath}/ipwhitelist.txt`;
 
 // OpenAI API Configuration
-/*
-const openaiConfig = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-});
-*/
-const openaiConfig = new Configuration({
-    apiKey: fs.readFileSync(path.join(configPath, 'keys/api_key.txt'), 'utf8').trim(),
-});
-const openai = new OpenAIApi(openaiConfig);
+let apiKey = fs.readFileSync(path.join(configPath, 'keys/api_key.txt'), 'utf8').trim();
+const openai = new OpenAI({ apiKey });
 
 // Helper to normalize IP addresses (IPv4-mapped IPv6)
 const formatIP = (ip) => (ip.includes('::ffff:') ? ip.split('::ffff:')[1] : ip);
@@ -75,6 +80,20 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(publicDir, 'index.html'));
 });
 
+// AI Greeting for New Sessions
+app.get('/greet', async (req, res) => {
+    const greetingPrompt = "Greet the user and ask how you can help today.";
+    
+    try {
+        const result = await doCompletion(greetingPrompt);
+        console.log(`AI Greeting Response: ${result}`);
+        res.json({ status: 'success', result });
+    } catch (err) {
+        console.error('Error generating greeting:', err.message);
+        res.status(500).json({ error: 'Failed to process greeting' });
+    }
+});
+
 // Handle POST /command with OpenAI
 app.post('/command', express.json(), async (req, res) => {
     const { command } = req.body;
@@ -91,6 +110,60 @@ app.post('/command', express.json(), async (req, res) => {
     } catch (err) {
         console.error('Error generating AI response:', err.message);
         res.status(500).json({ error: 'Failed to process command' });
+    }
+});
+
+// Create Assistant (Persist in MongoDB)
+app.post('/create-assistant', async (req, res) => {
+    const { name, instructions, description } = req.body;
+    try {
+        const assistant = await createAssistant(name, instructions, description);
+        res.json({ status: 'success', assistant });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to create assistant' });
+    }
+});
+
+// Start a New Thread
+app.post('/start-thread', async (req, res) => {
+    try {
+        const thread = await createThread();
+        res.json({ status: 'success', thread });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to start thread' });
+    }
+});
+
+// Add Message to Existing Thread
+app.post('/add-message', async (req, res) => {
+    const { threadId, message } = req.body;
+    try {
+        const response = await addMessageToThread(threadId, message);
+        res.json({ status: 'success', response });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to add message to thread' });
+    }
+});
+
+// Run Thread and Get Results
+app.post('/run-thread', async (req, res) => {
+    const { threadId } = req.body;
+    try {
+        const response = await runThread(threadId);
+        res.json({ status: 'success', response });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to run thread' });
+    }
+});
+
+// Fetch Messages from a Thread
+app.get('/thread-messages', async (req, res) => {
+    const { threadId } = req.query;
+    try {
+        const messages = await getThreadMessages(threadId);
+        res.json({ status: 'success', messages });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve thread messages' });
     }
 });
 
@@ -113,21 +186,7 @@ stream.stdout.on('data', (data) => {
     sseClients.forEach(client => client.write(`data: ${data}\n\n`));
 });
 
-// Start server on IPv6 (::)
+// Start Server
 const server = app.listen(8080, '::', () => {
     console.log('Server is running on port 8080 and accessible via IPv6');
 });
-
-// Log accessible IPs (both IPv4 and IPv6)
-console.log('\n--- Server IP Addresses ---');
-
-Object.entries(os.networkInterfaces()).forEach(([iface, addresses]) => {
-    addresses.forEach((address) => {
-        if (address.family === 'IPv4' || address.family === 'IPv6') {
-            const ipType = address.scopeid ? 'Link-Local' : 'Global';
-            console.log(`Server accessible at [${iface}] - ${ipType} ${address.family}: ${address.address}`);
-        }
-    });
-});
-
-console.log('--- End of IP Listing ---\n');
