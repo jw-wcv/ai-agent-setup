@@ -20,7 +20,7 @@ log_message "Installing required dependencies..."
 sudo apt install -y curl gnupg apt-transport-https python3 python3-pip build-essential ufw
 
 log_message "Decrypting API key..."
-openssl enc -aes-256-cbc -d -in "$ENCRYPTED_KEY_FILE" -out "$DECRYPTED_KEY_FILE" -k "$(hostname)-key"
+openssl enc -aes-256-cbc -d -pbkdf2 -in "$ENCRYPTED_KEY_FILE" -out "$DECRYPTED_KEY_FILE" -k "$(hostname)-key"
 export OPENAI_API_KEY=$(cat "$DECRYPTED_KEY_FILE")
 
 log_message "Configuring Node.js and PM2..."

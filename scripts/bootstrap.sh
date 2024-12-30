@@ -67,14 +67,23 @@ fi
 
 log_message "Resolved VM IP: $IPV6_VM_IP"
 
-# Copy encrypted key and whitelist to VM
+# Copy encrypted key and whitelist to VM (SCP handles brackets correctly)
 scp -i "$SSH_KEY" "$ENCRYPTED_KEY_FILE" setup_ai_agent.sh "$IP_WHITELIST_FILE" "$IPV6_VM_IP:/root/" || {
     log_message "Failed to SCP files to VM"
     exit 1
 }
 
 log_message "SSHing into VM and initializing setup..."
-ssh -i "$SSH_KEY" "$IPV6_VM_IP" "chmod +x /root/setup_ai_agent.sh && /root/setup_ai_agent.sh" || {
+
+# Strip brackets for SSH command to avoid hostname resolution issues
+SSH_VM_IP="${IPV6_VM_IP//[\[\]]/}"  # Remove brackets for SSH
+ssh -i "$SSH_KEY" "$SSH_VM_IP" "mkdir -p /root/config/keys && mv /root/api_key.enc /root/config/keys/" || {
+    log_message "Failed to create /root/config/keys and move files"
+    exit 1
+}
+
+# SSH into VM to run the setup script
+ssh -i "$SSH_KEY" "$SSH_VM_IP" "chmod +x /root/setup_ai_agent.sh && /root/setup_ai_agent.sh" || {
     log_message "Failed to SSH into VM"
     exit 1
 }
