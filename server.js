@@ -5,8 +5,10 @@ const { Configuration, OpenAIApi } = require('openai');
 const { spawn } = require('child_process');
 
 const configPath = '/root/ai-agent-setup/config';
-const whitelistPath = `${configPath}/ipwhitelist.txt`;
-const keysPath = `${configPath}/keys/api_key.txt`;
+//const whitelistPath = `${configPath}/ipwhitelist.txt`;
+const whitelistPath = '/root/ai-agent-setup/config/ipwhitelist.txt';
+//const keysPath = `${configPath}/keys/api_key.txt`;
+const keysPath = '/root/ai-agent-setup/config/keys/api_key.txt';
 
 function ensureWhitelist() {
     if (!fs.existsSync(whitelistPath)) {
