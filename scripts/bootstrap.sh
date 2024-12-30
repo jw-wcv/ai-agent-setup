@@ -55,34 +55,32 @@ log_message "Copying encrypted API key and whitelist to VM..."
 if [[ "$VM_IP" =~ ":" ]]; then
     USER_PART=$(echo "$VM_IP" | cut -d'@' -f1)
     IP_PART=$(echo "$VM_IP" | cut -d'@' -f2)
-
-    if [[ "$IP_PART" != \[* ]]; then
-        IP_PART="[$IP_PART]"
-    fi
-
-    IPV6_VM_IP="$USER_PART@$IP_PART"
+    
+    SSH_VM_IP="$USER_PART@$IP_PART"  # Leave IP plain for SSH
+    SCP_VM_IP="$USER_PART@[$IP_PART]"  # Use brackets only for SCP
 else
-    IPV6_VM_IP="$VM_IP"
+    SSH_VM_IP="$VM_IP"
+    SCP_VM_IP="$VM_IP"
 fi
 
-log_message "Resolved VM IP: $IPV6_VM_IP"
+log_message "Resolved SCP VM IP: $SCP_VM_IP"
+log_message "Resolved SSH VM IP: $SSH_VM_IP"
 
 # Ensure config/data directory exists on the VM
-ssh -i "$SSH_KEY" "$IPV6_VM_IP" "mkdir -p /root/config/data" || {
+ssh -i "$SSH_KEY" "$SSH_VM_IP" "mkdir -p /root/config/data" || {
     log_message "Failed to create /root/config/data on VM"
     exit 1
 }
 
 # Copy encrypted key and whitelist to VM /root/config/data/
-scp -i "$SSH_KEY" "$ENCRYPTED_KEY_FILE" setup_ai_agent.sh "$IP_WHITELIST_FILE" "$IPV6_VM_IP:/root/config/data/" || {
+scp -i "$SSH_KEY" "$ENCRYPTED_KEY_FILE" setup_ai_agent.sh "$IP_WHITELIST_FILE" "$SCP_VM_IP:/root/config/data/" || {
     log_message "Failed to SCP files to VM"
     exit 1
 }
 
 log_message "SSHing into VM and initializing setup..."
 
-# Strip brackets for SSH command to avoid hostname resolution issues
-SSH_VM_IP="${IPV6_VM_IP//[\[\]]/}"  # Remove brackets for SSH
+# SSH into VM to run the setup script
 ssh -i "$SSH_KEY" "$SSH_VM_IP" "chmod +x /root/config/data/setup_ai_agent.sh && /root/config/data/setup_ai_agent.sh" || {
     log_message "Failed to SSH into VM"
     exit 1

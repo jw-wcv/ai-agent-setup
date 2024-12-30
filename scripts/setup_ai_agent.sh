@@ -47,7 +47,11 @@ if [ ! -f "$ALLOWED_IPS_FILE" ]; then
 fi
 
 while read -r ip; do
-    sudo ufw allow from "$ip" to any port 8080
+    if [[ -n "$ip" ]] && [[ "$ip" =~ ^[0-9a-fA-F:.]+$ ]]; then
+        sudo ufw allow from "$ip" to any port 8080
+    else
+        log_message "Skipping invalid IP or empty line: $ip"
+    fi
 done < "$ALLOWED_IPS_FILE"
 sudo ufw enable
 
