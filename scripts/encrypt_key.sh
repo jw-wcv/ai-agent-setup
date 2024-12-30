@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+ENCRYPTED_KEY_FILE="api_key.enc"
+PLAIN_KEY_FILE="api_key.txt"
+
+if [ -z "$1" ]; then
+    echo "Usage: ./encrypt_key.sh <API_KEY>"
+    exit 1
+fi
+
+API_KEY=$1
+echo "$API_KEY" > "$PLAIN_KEY_FILE"
+
+echo "Encrypting API key..."
+openssl enc -aes-256-cbc -salt -in "$PLAIN_KEY_FILE" -out "$ENCRYPTED_KEY_FILE" -k "$(hostname)-key"
+
+echo "Encrypted API key saved to $ENCRYPTED_KEY_FILE"
+rm "$PLAIN_KEY_FILE"  # Clean up plain text key for security
