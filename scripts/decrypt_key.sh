@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-CONFIG_DIR="/root/config"
+CONFIG_DIR="/root/ai-agent-setup/config"  # FIXED PATH
 KEYS_DIR="$CONFIG_DIR/keys"
 DATA_DIR="$CONFIG_DIR/data"
 FILES_DIR="$CONFIG_DIR/files"
