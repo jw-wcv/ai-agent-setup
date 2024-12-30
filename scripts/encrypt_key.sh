@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-CONFIG_DIR="/root/ai-agent-setup/config"  # FIXED PATH
+# Load environment variables
+source /root/ai-agent-setup/.env
+
 KEYS_DIR="$CONFIG_DIR/keys"
 
 mkdir -p "$KEYS_DIR"
@@ -21,4 +23,4 @@ echo "Encrypting API key..."
 openssl enc -aes-256-cbc -salt -in "$PLAIN_KEY_FILE" -out "$ENCRYPTED_KEY_FILE" -k "$(hostname)-key"
 
 echo "Encrypted API key saved to $ENCRYPTED_KEY_FILE"
-rm "$PLAIN_KEY_FILE"  # Clean up plain text key for security
+rm "$PLAIN_KEY_FILE"

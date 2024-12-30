@@ -1,7 +1,9 @@
 #!/bin/bash
 set -e
 
-CONFIG_DIR="/root/ai-agent-setup/config"
+# Load environment variables
+source /root/ai-agent-setup/.env
+
 KEYS_DIR="$CONFIG_DIR/keys"
 DATA_DIR="$CONFIG_DIR/data"
 FILES_DIR="/root/ai-agent-setup"
@@ -12,7 +14,7 @@ ENCRYPTED_KEY_FILE="$KEYS_DIR/api_key.enc"
 DECRYPTED_KEY_FILE="$KEYS_DIR/api_key.txt"
 ALLOWED_IPS_FILE="$CONFIG_DIR/ipwhitelist.txt"
 
-API_KEY="$1"  # Pass API Key as the first argument
+API_KEY="$1"  # API Key passed as the first argument
 
 log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
@@ -25,22 +27,22 @@ log_message "Installing required dependencies..."
 sudo apt update
 sudo apt install -y curl gnupg apt-transport-https python3 python3-pip build-essential ufw > /dev/null 2>&1
 
-# Ensure /root/config files are moved to the correct location
+# Move misplaced config files (if any)
 if [ -d /root/config ]; then
-    log_message "Moving files from /root/config to /root/ai-agent-setup/config..."
+    log_message "Moving files from /root/config to $CONFIG_DIR..."
     sudo mv /root/config/* "$CONFIG_DIR/" 2>/dev/null || true
     sudo rm -rf /root/config
 fi
 
-# Ensure Whitelist Exists (Auto-Creation)
+# Ensure whitelist exists
 if [ ! -f "$ALLOWED_IPS_FILE" ]; then
-    log_message "Whitelist not found. Creating $ALLOWED_IPS_FILE with 127.0.0.1"
+    log_message "Whitelist not found. Creating default with localhost."
     echo "127.0.0.1" > "$ALLOWED_IPS_FILE"
 else
     log_message "Whitelist found at $ALLOWED_IPS_FILE"
 fi
 
-# Cleanup Whitelist (Ensure No Invalid Entries)
+# Clean up the whitelist (remove blank or invalid entries)
 sed -i 's/\r//' "$ALLOWED_IPS_FILE"
 sed -i '/^$/d' "$ALLOWED_IPS_FILE"
 sed -i 's/[[:space:]]*$//' "$ALLOWED_IPS_FILE"
@@ -74,12 +76,11 @@ sudo apt install -y nodejs docker.io > /dev/null 2>&1
 sudo npm install -g pm2 > /dev/null 2>&1
 sudo systemctl enable --now docker
 
-# UFW Setup and IP Whitelisting
-log_message "Configuring firewall rules (UFW)..."
+# UFW and Whitelist Setup
+log_message "Configuring firewall (UFW)..."
 sudo ufw allow ssh
 sudo ufw default deny incoming
 
-# Validate and Add Whitelisted IPs
 while read -r ip; do
     log_message "Processing IP: $ip"
     if [[ -n "$ip" && ("$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ || "$ip" =~ ^[0-9a-fA-F:]+$) ]]; then
@@ -94,9 +95,7 @@ while read -r ip; do
     fi
 done < "$ALLOWED_IPS_FILE"
 
-# Replace the Whitelist with Valid IPs
 mv "$VALID_IPS" "$ALLOWED_IPS_FILE"
-
 sudo ufw enable
 
 log_message "Starting AI Agent server..."
