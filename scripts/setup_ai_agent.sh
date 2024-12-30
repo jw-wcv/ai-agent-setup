@@ -10,7 +10,7 @@ mkdir -p "$KEYS_DIR" "$DATA_DIR" "$FILES_DIR"
 
 ENCRYPTED_KEY_FILE="$KEYS_DIR/api_key.enc"
 DECRYPTED_KEY_FILE="$KEYS_DIR/api_key.txt"
-ALLOWED_IPS_FILE="$DATA_DIR/ipwhitelist"
+ALLOWED_IPS_FILE="$DATA_DIR/ipwhitelist.txt"  # Use correct file path
 
 log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
@@ -33,6 +33,13 @@ sudo systemctl enable --now docker
 log_message "Enabling UFW and setting up IP whitelist..."
 sudo ufw allow ssh
 sudo ufw default deny incoming
+
+# Ensure whitelist exists
+if [ ! -f "$ALLOWED_IPS_FILE" ]; then
+    log_message "Creating default IP whitelist..."
+    echo "127.0.0.1" > "$ALLOWED_IPS_FILE"
+fi
+
 while read -r ip; do
     sudo ufw allow from "$ip" to any port 8080
 done < "$ALLOWED_IPS_FILE"
