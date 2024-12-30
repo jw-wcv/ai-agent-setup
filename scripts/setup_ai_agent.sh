@@ -102,7 +102,13 @@ log_message "Starting AI Agent server..."
 
 cd "$FILES_DIR"
 if [ -f "package.json" ]; then
-    npm install
+    log_message "Running npm install to ensure dependencies..."
+    npm install || {
+        log_message "npm install failed. Exiting."
+        exit 1
+    }
+
+    log_message "Dependencies installed. Starting server with PM2..."
     pm2 start server.js --name ai-agent-server || {
         log_message "Failed to start server with PM2. Exiting."
         exit 1
