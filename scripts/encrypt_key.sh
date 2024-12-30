@@ -1,8 +1,13 @@
 #!/bin/bash
 set -e
 
-ENCRYPTED_KEY_FILE="api_key.enc"
-PLAIN_KEY_FILE="api_key.txt"
+CONFIG_DIR="/root/config"
+KEYS_DIR="$CONFIG_DIR/keys"
+
+mkdir -p "$KEYS_DIR"
+
+ENCRYPTED_KEY_FILE="$KEYS_DIR/api_key.enc"
+PLAIN_KEY_FILE="$KEYS_DIR/api_key.txt"
 
 if [ -z "$1" ]; then
     echo "Usage: ./encrypt_key.sh <API_KEY>"

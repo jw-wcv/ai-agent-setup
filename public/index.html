@@ -1,25 +1,58 @@
-# public/index.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Agent Console</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; }
-        #console { white-space: pre-wrap; background: #000; color: #0f0; padding: 20px; border-radius: 8px; height: 500px; overflow-y: scroll; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>AI Agent - Console Output</h1>
-    <div id="console"></div>
+    <div class="container">
+        <h1>AI Agent - Virtual Machine Console</h1>
+        <div class="console-wrapper">
+            <div id="console" class="console"></div>
+        </div>
+        <div class="command-input">
+            <input type="text" id="command" placeholder="Type command..." autofocus>
+            <button onclick="sendCommand()">Send</button>
+        </div>
+    </div>
+
     <script>
         const evtSource = new EventSource('/stream');
         const consoleDiv = document.getElementById('console');
+        const commandInput = document.getElementById('command');
+        
         evtSource.onmessage = function(event) {
             consoleDiv.innerHTML += event.data + "\n";
             consoleDiv.scrollTop = consoleDiv.scrollHeight;
         };
+        
+        function sendCommand() {
+            const command = commandInput.value;
+            if (command) {
+                fetch('/command', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ command })
+                }).then(response => response.json())
+                  .then(data => {
+                      consoleDiv.innerHTML += `\n> ${command}`;
+                      consoleDiv.innerHTML += `\n${data.result}\n`;
+                      consoleDiv.scrollTop = consoleDiv.scrollHeight;
+                  });
+                commandInput.value = '';
+            }
+        }
+
+        // Allow pressing Enter to send command
+        commandInput.addEventListener("keypress", function(e) {
+            if (e.key === 'Enter') {
+                sendCommand();
+            }
+        });
     </script>
 </body>
 </html>

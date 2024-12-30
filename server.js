@@ -1,14 +1,15 @@
-// server.js
 const express = require('express');
 const fs = require('fs');
 const app = express();
 const { Configuration, OpenAIApi } = require('openai');
+const { spawn } = require('child_process');
 
-const apiKey = fs.readFileSync('/root/api_key.txt', 'utf8').trim();
-const config = new Configuration({ apiKey });
-const openai = new OpenAIApi(config);
+const configPath = '/root/config';
+const apiKey = fs.readFileSync(`${configPath}/keys/api_key.txt`, 'utf8').trim();
+const whitelist = fs.readFileSync(`${configPath}/data/ipwhitelist`, 'utf8').split('\n').filter(Boolean);
 
-const whitelist = fs.readFileSync('/root/ipwhitelist', 'utf8').split('\n').filter(Boolean);
+const configuration = new Configuration({ apiKey });
+const openai = new OpenAIApi(configuration);
 
 app.use((req, res, next) => {
     const clientIp = req.ip || req.connection.remoteAddress;
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static('public'));
 
+// Handle text generation from OpenAI
 app.post('/generate', async (req, res) => {
     const { prompt } = req.body;
     try {
@@ -36,11 +38,7 @@ app.post('/generate', async (req, res) => {
     }
 });
 
-const server = app.listen(8080, () => {
-    console.log('AI Agent running on port 8080');
-});
-
-const { spawn } = require('child_process');
+// Real-time streaming setup (syslog example)
 const stream = spawn('tail', ['-f', '/var/log/syslog']);
 const sseClients = [];
 
@@ -58,4 +56,8 @@ app.get('/stream', (req, res) => {
 
 stream.stdout.on('data', (data) => {
     sseClients.forEach(client => client.write(`data: ${data}\n\n`));
+});
+
+const server = app.listen(8080, () => {
+    console.log('AI Agent running on port 8080');
 });
