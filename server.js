@@ -4,9 +4,9 @@ const app = express();
 const { Configuration, OpenAIApi } = require('openai');
 const { spawn } = require('child_process');
 
-const configPath = '/root/config';
+const configPath = '/root/ai-agent-setup/config';
 const apiKey = fs.readFileSync(`${configPath}/keys/api_key.txt`, 'utf8').trim();
-const whitelist = fs.readFileSync(`${configPath}/ipwhitelist`, 'utf8').split('\n').filter(Boolean);
+const whitelist = fs.readFileSync(`${configPath}/ipwhitelist.txt`, 'utf8').split('\n').filter(Boolean);
 
 const configuration = new Configuration({ apiKey });
 const openai = new OpenAIApi(configuration);
