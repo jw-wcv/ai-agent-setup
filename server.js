@@ -3,12 +3,24 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { Configuration, OpenAIApi, OpenAI } = require('openai');
 const app = express();
 const { spawn } = require('child_process');
-
+import { doCompletion } from './services/aiServices';
 // Paths
 const configPath = process.env.CONFIG_DIR || '/root/ai-agent-setup/config';
 const whitelistPath = `${configPath}/ipwhitelist.txt`;
+
+// OpenAI API Configuration
+/*
+const openaiConfig = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+*/
+const openaiConfig = new Configuration({
+    apiKey: fs.readFileSync(path.join(configPath, 'keys/api_key.txt'), 'utf8').trim(),
+});
+const openai = new OpenAIApi(openaiConfig);
 
 // Helper to normalize IP addresses (IPv4-mapped IPv6)
 const formatIP = (ip) => (ip.includes('::ffff:') ? ip.split('::ffff:')[1] : ip);
@@ -61,6 +73,25 @@ app.use(express.static(publicDir));
 app.get('/', (req, res) => {
     console.log('Serving index.html');
     res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+// Handle POST /command with OpenAI
+app.post('/command', express.json(), async (req, res) => {
+    const { command } = req.body;
+    console.log(`Received command: ${command}`);
+
+    if (!command) {
+        return res.status(400).json({ error: 'No command provided' });
+    }
+
+    try {
+        const result = await doCompletion(command);
+        console.log(`OpenAI Response: ${result}`);
+        res.json({ status: 'success', result });
+    } catch (err) {
+        console.error('Error generating AI response:', err.message);
+        res.status(500).json({ error: 'Failed to process command' });
+    }
 });
 
 // Real-time log streaming (syslog)
