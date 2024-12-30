@@ -10,18 +10,24 @@ mkdir -p "$KEYS_DIR" "$DATA_DIR" "$FILES_DIR"
 
 ENCRYPTED_KEY_FILE="$KEYS_DIR/api_key.enc"
 DECRYPTED_KEY_FILE="$KEYS_DIR/api_key.txt"
-ALLOWED_IPS_FILE="$DATA_DIR/ipwhitelist.txt"  # Use correct file path
+ALLOWED_IPS_FILE="$DATA_DIR/ipwhitelist.txt"  # Ensure correct path
 
 log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1"
 }
 
 log_message "Installing required dependencies..."
+sudo apt update
 sudo apt install -y curl gnupg apt-transport-https python3 python3-pip build-essential ufw
 
 log_message "Decrypting API key..."
-openssl enc -aes-256-cbc -d -pbkdf2 -in "$ENCRYPTED_KEY_FILE" -out "$DECRYPTED_KEY_FILE" -k "$(hostname)-key"
-export OPENAI_API_KEY=$(cat "$DECRYPTED_KEY_FILE")
+if [ -f "$ENCRYPTED_KEY_FILE" ]; then
+    openssl enc -aes-256-cbc -d -pbkdf2 -in "$ENCRYPTED_KEY_FILE" -out "$DECRYPTED_KEY_FILE" -k "$(hostname)-key"
+    export OPENAI_API_KEY=$(cat "$DECRYPTED_KEY_FILE")
+else
+    log_message "Encrypted API key not found!"
+    exit 1
+fi
 
 log_message "Configuring Node.js and PM2..."
 curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
