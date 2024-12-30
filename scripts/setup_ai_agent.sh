@@ -10,7 +10,7 @@ mkdir -p "$KEYS_DIR" "$DATA_DIR"
 
 ENCRYPTED_KEY_FILE="$KEYS_DIR/api_key.enc"
 DECRYPTED_KEY_FILE="$KEYS_DIR/api_key.txt"
-ALLOWED_IPS_FILE="$CONFIG_DIR/ipwhitelist.txt"  # Simplified Pathing
+ALLOWED_IPS_FILE="$CONFIG_DIR/ipwhitelist.txt"
 
 API_KEY="$1"  # Pass API Key as the first argument
 
@@ -32,6 +32,13 @@ if [ ! -f "$ALLOWED_IPS_FILE" ]; then
 else
     log_message "Whitelist found at $ALLOWED_IPS_FILE"
 fi
+
+# Cleanup Whitelist (Ensure No Invalid Entries)
+sed -i 's/\r//' "$ALLOWED_IPS_FILE"
+sed -i '/^$/d' "$ALLOWED_IPS_FILE"
+sed -i 's/[[:space:]]*$//' "$ALLOWED_IPS_FILE"
+
+VALID_IPS=$(mktemp)
 
 # Encrypt API Key (if provided)
 if [ -n "$API_KEY" ]; then
@@ -65,13 +72,23 @@ log_message "Configuring firewall rules (UFW)..."
 sudo ufw allow ssh
 sudo ufw default deny incoming
 
+# Validate and Add Whitelisted IPs
 while read -r ip; do
     log_message "Processing IP: $ip"
     if [[ -n "$ip" && ("$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ || "$ip" =~ ^[0-9a-fA-F:]+$) ]]; then
-        sudo ufw allow from "$ip" to any port 8080
-        log_message "Added $ip to UFW."
+        if sudo ufw allow from "$ip" to any port 8080; then
+            log_message "Added $ip to UFW."
+            echo "$ip" >> "$VALID_IPS"
+        else
+            log_message "Failed to add $ip. Marking as invalid."
+        fi
+    else
+        log_message "Invalid IP: $ip (skipped)"
     fi
 done < "$ALLOWED_IPS_FILE"
+
+# Replace the Whitelist with Valid IPs
+mv "$VALID_IPS" "$ALLOWED_IPS_FILE"
 
 sudo ufw enable
 
@@ -80,7 +97,10 @@ log_message "Starting AI Agent server..."
 cd "$FILES_DIR"
 if [ -f "package.json" ]; then
     npm install
-    pm2 start server.js --name ai-agent-server
+    pm2 start server.js --name ai-agent-server || {
+        log_message "Failed to start server with PM2. Exiting."
+        exit 1
+    }
     pm2 startup
     pm2 save
     log_message "AI Agent server started successfully."
