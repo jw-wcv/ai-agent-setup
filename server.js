@@ -5,17 +5,41 @@ const { Configuration, OpenAIApi } = require('openai');
 const { spawn } = require('child_process');
 
 const configPath = '/root/ai-agent-setup/config';
-const apiKey = fs.readFileSync(`${configPath}/keys/api_key.txt`, 'utf8').trim();
-const whitelist = fs.readFileSync(`${configPath}/ipwhitelist.txt`, 'utf8').split('\n').filter(Boolean);
+const whitelistPath = `${configPath}/ipwhitelist.txt`;
+const apiKeyPath = `${configPath}/keys/api_key.txt`;
+
+// Ensure config paths and files exist
+if (!fs.existsSync(configPath)) {
+    console.error(`[ERROR] Config path does not exist. Creating: ${configPath}`);
+    fs.mkdirSync(configPath, { recursive: true });
+}
+
+// Ensure ipwhitelist.txt exists
+if (!fs.existsSync(whitelistPath)) {
+    console.warn(`[WARN] Whitelist file not found. Creating default: ${whitelistPath}`);
+    fs.writeFileSync(whitelistPath, '127.0.0.1\n');
+}
+
+// Ensure API Key file exists
+if (!fs.existsSync(apiKeyPath)) {
+    console.error(`[ERROR] API key not found at: ${apiKeyPath}`);
+    process.exit(1);
+}
+
+const apiKey = fs.readFileSync(apiKeyPath, 'utf8').trim();
+const whitelist = fs.readFileSync(whitelistPath, 'utf8').split('\n').filter(Boolean);
 
 const configuration = new Configuration({ apiKey });
 const openai = new OpenAIApi(configuration);
 
 app.use((req, res, next) => {
     const clientIp = req.ip || req.connection.remoteAddress;
+    console.log(`[INFO] Incoming request from IP: ${clientIp}`);
+    
     if (whitelist.includes(clientIp)) {
         next();
     } else {
+        console.warn(`[WARN] Unauthorized access from IP: ${clientIp}`);
         res.status(403).json({ error: 'Access denied' });
     }
 });
@@ -38,7 +62,7 @@ app.post('/generate', async (req, res) => {
     }
 });
 
-// Real-time streaming setup (syslog example)
+// Real-time streaming setup
 const stream = spawn('tail', ['-f', '/var/log/syslog']);
 const sseClients = [];
 
