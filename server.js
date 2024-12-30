@@ -1,46 +1,42 @@
 require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
+const os = require('os');
 const app = express();
-const { Configuration, OpenAIApi } = require('openai');
 const { spawn } = require('child_process');
 
-// Use environment variable for config path
+// Paths
 const configPath = process.env.CONFIG_DIR || '/root/ai-agent-setup/config';
 const whitelistPath = `${configPath}/ipwhitelist.txt`;
-const keysPath = `${configPath}/keys/api_key.txt`;
 
-function ensureWhitelist() {
+// Helper to normalize IP addresses (IPv4-mapped IPv6)
+const formatIP = (ip) => (ip.includes('::ffff:') ? ip.split('::ffff:')[1] : ip);
+
+// Ensure whitelist file exists
+const ensureWhitelist = () => {
     if (!fs.existsSync(whitelistPath)) {
         console.log('Whitelist not found. Creating default with localhost.');
         fs.writeFileSync(whitelistPath, '127.0.0.1\n');
     }
-}
-
-// Ensure both whitelist and API key exist before proceeding
+};
 ensureWhitelist();
 
-let apiKey;
-try {
-    apiKey = fs.readFileSync(keysPath, 'utf8').trim();
-} catch (err) {
-    console.error(`ERROR: Failed to load API key from ${keysPath}`);
-    process.exit(1);
-}
-
-let whitelist;
+// Load whitelist
+let whitelist = [];
 try {
     whitelist = fs.readFileSync(whitelistPath, 'utf8').split('\n').filter(Boolean);
+    console.log('Loaded Whitelist IPs:', whitelist);
 } catch (err) {
-    console.warn('WARN: Failed to read whitelist. Falling back to localhost.');
+    console.error('Failed to load whitelist. Defaulting to localhost.');
     whitelist = ['127.0.0.1'];
 }
 
-const configuration = new Configuration({ apiKey });
-const openai = new OpenAIApi(configuration);
-
+// Middleware for IP filtering
 app.use((req, res, next) => {
-    const clientIp = req.ip || req.connection.remoteAddress;
+    const clientIp = formatIP(req.ip || req.connection.remoteAddress);
+    console.log(`Incoming request from IP: ${clientIp} - ${req.method} ${req.url}`);
+
     if (whitelist.includes(clientIp)) {
         next();
     } else {
@@ -49,22 +45,22 @@ app.use((req, res, next) => {
     }
 });
 
-app.use(express.json());
-app.use(express.static('public'));
+// Set CORS headers for all requests
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+});
 
-// OpenAI text generation
-app.post('/generate', async (req, res) => {
-    const { prompt } = req.body;
-    try {
-        const response = await openai.createCompletion({
-            model: "text-davinci-003",
-            prompt,
-            max_tokens: 150,
-        });
-        res.json({ result: response.data.choices[0].text });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+// Serve static files
+const publicDir = path.join(__dirname, 'public');
+app.use(express.static(publicDir));
+
+// Serve index.html for the root route
+app.get('/', (req, res) => {
+    console.log('Serving index.html');
+    res.sendFile(path.join(publicDir, 'index.html'));
 });
 
 // Real-time log streaming (syslog)
@@ -75,11 +71,10 @@ app.get('/stream', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     sseClients.push(res);
+
     req.on('close', () => {
         const index = sseClients.indexOf(res);
-        if (index !== -1) {
-            sseClients.splice(index, 1);
-        }
+        if (index !== -1) sseClients.splice(index, 1);
     });
 });
 
@@ -87,6 +82,21 @@ stream.stdout.on('data', (data) => {
     sseClients.forEach(client => client.write(`data: ${data}\n\n`));
 });
 
-const server = app.listen(8080, () => {
-    console.log('AI Agent running on port 8080');
+// Start server on IPv6 (::)
+const server = app.listen(8080, '::', () => {
+    console.log('Server is running on port 8080 and accessible via IPv6');
 });
+
+// Log accessible IPs (both IPv4 and IPv6)
+console.log('\n--- Server IP Addresses ---');
+
+Object.entries(os.networkInterfaces()).forEach(([iface, addresses]) => {
+    addresses.forEach((address) => {
+        if (address.family === 'IPv4' || address.family === 'IPv6') {
+            const ipType = address.scopeid ? 'Link-Local' : 'Global';
+            console.log(`Server accessible at [${iface}] - ${ipType} ${address.family}: ${address.address}`);
+        }
+    });
+});
+
+console.log('--- End of IP Listing ---\n');
