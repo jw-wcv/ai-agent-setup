@@ -25,6 +25,13 @@ log_message "Installing required dependencies..."
 sudo apt update
 sudo apt install -y curl gnupg apt-transport-https python3 python3-pip build-essential ufw > /dev/null 2>&1
 
+# Ensure /root/config files are moved to the correct location
+if [ -d /root/config ]; then
+    log_message "Moving files from /root/config to /root/ai-agent-setup/config..."
+    sudo mv /root/config/* "$CONFIG_DIR/" 2>/dev/null || true
+    sudo rm -rf /root/config
+fi
+
 # Ensure Whitelist Exists (Auto-Creation)
 if [ ! -f "$ALLOWED_IPS_FILE" ]; then
     log_message "Whitelist not found. Creating $ALLOWED_IPS_FILE with 127.0.0.1"
