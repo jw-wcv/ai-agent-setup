@@ -6,40 +6,43 @@ const { spawn } = require('child_process');
 
 const configPath = '/root/ai-agent-setup/config';
 const whitelistPath = `${configPath}/ipwhitelist.txt`;
-const apiKeyPath = `${configPath}/keys/api_key.txt`;
+const keysPath = `${configPath}/keys/api_key.txt`;
 
-// Ensure config paths and files exist
-if (!fs.existsSync(configPath)) {
-    console.error(`[ERROR] Config path does not exist. Creating: ${configPath}`);
-    fs.mkdirSync(configPath, { recursive: true });
+function ensureWhitelist() {
+    if (!fs.existsSync(whitelistPath)) {
+        console.log('Whitelist not found. Creating default with localhost.');
+        fs.writeFileSync(whitelistPath, '127.0.0.1\n');
+    }
 }
 
-// Ensure ipwhitelist.txt exists
-if (!fs.existsSync(whitelistPath)) {
-    console.warn(`[WARN] Whitelist file not found. Creating default: ${whitelistPath}`);
-    fs.writeFileSync(whitelistPath, '127.0.0.1\n');
-}
+// Ensure both whitelist and API key exist before proceeding
+ensureWhitelist();
 
-// Ensure API Key file exists
-if (!fs.existsSync(apiKeyPath)) {
-    console.error(`[ERROR] API key not found at: ${apiKeyPath}`);
+let apiKey;
+try {
+    apiKey = fs.readFileSync(keysPath, 'utf8').trim();
+} catch (err) {
+    console.error(`ERROR: Failed to load API key from ${keysPath}`);
     process.exit(1);
 }
 
-const apiKey = fs.readFileSync(apiKeyPath, 'utf8').trim();
-const whitelist = fs.readFileSync(whitelistPath, 'utf8').split('\n').filter(Boolean);
+let whitelist;
+try {
+    whitelist = fs.readFileSync(whitelistPath, 'utf8').split('\n').filter(Boolean);
+} catch (err) {
+    console.warn('WARN: Failed to read whitelist. Falling back to localhost.');
+    whitelist = ['127.0.0.1'];
+}
 
 const configuration = new Configuration({ apiKey });
 const openai = new OpenAIApi(configuration);
 
 app.use((req, res, next) => {
     const clientIp = req.ip || req.connection.remoteAddress;
-    console.log(`[INFO] Incoming request from IP: ${clientIp}`);
-    
     if (whitelist.includes(clientIp)) {
         next();
     } else {
-        console.warn(`[WARN] Unauthorized access from IP: ${clientIp}`);
+        console.warn(`ACCESS DENIED for IP: ${clientIp}`);
         res.status(403).json({ error: 'Access denied' });
     }
 });
@@ -47,7 +50,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.static('public'));
 
-// Handle text generation from OpenAI
+// OpenAI text generation
 app.post('/generate', async (req, res) => {
     const { prompt } = req.body;
     try {
@@ -62,7 +65,7 @@ app.post('/generate', async (req, res) => {
     }
 });
 
-// Real-time streaming setup
+// Real-time log streaming (syslog)
 const stream = spawn('tail', ['-f', '/var/log/syslog']);
 const sseClients = [];
 
