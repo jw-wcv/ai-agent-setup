@@ -9,17 +9,14 @@ const { spawn } = require('child_process');
 const { OpenAIApi, OpenAI } = require('openai');
 const db = require('./services/dbServices'); 
 const Assistant = require('./database/models/Assistant');
-const { 
-    doCompletion, 
-    createAssistant, 
-    createThread, 
-    addMessageToThread, 
-    runThread, 
-    getThreadMessages,
-    ensureAssistant,
+const {
+    getOrCreateThread,  
     handleCommand,
-    getOrCreateThread
+    runThread,
+    addMessageToThread,
+    createThread
 } = require('./services/aiServices');
+
 
 const app = express();
 app.use(express.json());
