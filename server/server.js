@@ -116,17 +116,25 @@ app.get('/vm-log-stream', (req, res) => {
 
 // Greet user on load
 app.get('/greet', async (req, res) => {
-    const threadId = await getOrCreateThread();
-    const greetingPrompt = "Greet the user and ask how you can help today.";
-    
     try {
-        const result = await doCompletion(greetingPrompt);
-        console.log(`AI Greeting Response: ${result}`);
-        res.json({ status: 'success', result });
+        const assistantId = await ensureAssistant();
+        const threadId = await getOrCreateThread();
+        const greetingPrompt = "Greet the user and ask how you can help today.";
+
+        const response = await addMessageToThread(threadId, greetingPrompt);
+        await runThread(threadId);
+
+        const messages = await getThreadMessages(threadId);
+        const latestMessage = messages[messages.length - 1]?.content || "Hello! How can I assist you today?";
+
+        console.log(`AI Greeting Response: ${latestMessage}`);
+        res.json({ status: 'success', result: latestMessage });
     } catch (err) {
+        console.error('Error during greeting:', err.message);
         res.status(500).json({ error: 'Failed to process greeting' });
     }
 });
+
 
 
 // Handle POST /command with thread management

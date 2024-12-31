@@ -30,8 +30,8 @@ async function ensureAssistant() {
         if (!assistant) {
             const newAssistant = await createAssistant(
                 "AI Virtual Machine Agent",
-                "Manage virtual machines and execute commands based on user input.",
-                "Virtual assistant capable of handling VM tasks"
+                "You are an AI managing virtual machines. Greet users and perform tasks as instructed.",
+                "AI agent capable of managing VM tasks and responding to user requests."
             );
             assistant = new AssistantModel({
                 assistantId: newAssistant.id,
@@ -50,6 +50,7 @@ async function ensureAssistant() {
         throw error;
     }
 }
+
 
 // Perform a text completion using OpenAI SDK
 async function doCompletion(prompt, maxTokens = 500, temperature = 0.7) {

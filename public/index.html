@@ -30,19 +30,13 @@
                 if (data.status === 'success') {
                     consoleDiv.innerHTML += `<div>AI: ${data.result}</div>`;
                 } else {
-                    consoleDiv.innerHTML += `<div>Error retrieving greeting.</div>`;
+                    consoleDiv.innerHTML += `<div>Error retrieving greeting: ${data.error}</div>`;
                 }
             } catch (err) {
                 consoleDiv.innerHTML += `<div>Error contacting AI agent.</div>`;
             }
-
-            // Start VM Log Stream
-            const vmLogStream = new EventSource('/vm-log-stream');
-            vmLogStream.onmessage = (event) => {
-                consoleDiv.innerHTML += `<div class="log">[VM LOG] ${event.data}</div>`;
-                consoleDiv.scrollTop = consoleDiv.scrollHeight;
-            };
         };
+        
 
         // Send user command to server
         async function sendCommand() {
