@@ -149,11 +149,20 @@ app.post('/command', async (req, res) => {
 
     try {
         const result = await handleCommand(command);
-        res.json({ status: 'success', result });
+
+        // Ensure the response is properly handled and sent as text
+        if (typeof result === 'object') {
+            res.json({ status: 'success', result: JSON.stringify(result) });
+        } else {
+            res.json({ status: 'success', result });
+        }
+
     } catch (err) {
+        console.error('Error processing command:', err.message);
         res.status(500).json({ error: 'Failed to process command' });
     }
 });
+
 
 
 // Create Assistant (Persist in MongoDB)

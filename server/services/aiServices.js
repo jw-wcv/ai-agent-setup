@@ -180,13 +180,22 @@ async function handleCommand(command) {
     
     // Extract AI response (latest message)
     const latestMessage = messages[messages.length - 1];
-    
+
+    let responseText = '';
+
+    // Extract text properly from the content array
     if (latestMessage && latestMessage.content) {
-        return latestMessage.content[0]?.text?.value || "AI did not return a response.";
-    } else {
-        return "No response from AI.";
+        latestMessage.content.forEach(item => {
+            if (item.text && item.text.value) {
+                responseText += item.text.value + ' ';
+            }
+        });
     }
+
+    // Return formatted text or fallback
+    return responseText.trim() || "AI did not return a response.";
 }
+
 
 
 module.exports = {

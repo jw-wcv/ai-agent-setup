@@ -39,42 +39,44 @@
         
 
         // Send user command to server
-        async function sendCommand() {
-            const command = commandInput.value;
-            if (command) {
-                const response = await fetch('/command', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ command })
-                });
-                const data = await response.json();
-                
-                consoleDiv.innerHTML += `<div>User: ${command}</div>`;
-                
-                if (data.status === 'success') {
-                    const aiResponse = data.result;
+       // Send user command to server
+async function sendCommand() {
+    const command = commandInput.value;
+    if (command) {
+        const response = await fetch('/command', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ command })
+        });
+        const data = await response.json();
         
-                    // Extract each text segment from the array
-                    let aiMessage = '';
-                    if (Array.isArray(aiResponse)) {
-                        aiResponse.forEach((item) => {
-                            if (item.text && item.text.value) {
-                                aiMessage += item.text.value + ' ';
-                            }
-                        });
-                    } else {
-                        aiMessage = JSON.stringify(aiResponse);
+        consoleDiv.innerHTML += `<div>User: ${command}</div>`;
+        
+        if (data.status === 'success') {
+            const aiResponse = data.result;
+
+            // Extract each text segment from the array
+            let aiMessage = '';
+            if (Array.isArray(aiResponse)) {
+                aiResponse.forEach((item) => {
+                    if (item.text && item.text.value) {
+                        aiMessage += item.text.value + ' ';
                     }
-        
-                    consoleDiv.innerHTML += `<div>AI: ${aiMessage.trim()}</div>`;
-                } else {
-                    consoleDiv.innerHTML += `<div>Error processing command.</div>`;
-                }
-        
-                commandInput.value = '';
-                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+                });
+            } else {
+                aiMessage = aiResponse;
             }
+
+            consoleDiv.innerHTML += `<div>AI: ${aiMessage.trim()}</div>`;
+        } else {
+            consoleDiv.innerHTML += `<div>Error processing command.</div>`;
         }
+
+        commandInput.value = '';
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }
+}
+
         
 
         // Allow pressing Enter to send command
