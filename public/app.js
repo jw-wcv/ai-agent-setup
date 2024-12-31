@@ -8,10 +8,12 @@ document.addEventListener("DOMContentLoaded", function () {
     // Greet the user immediately when the page loads
     window.onload = async function() {
         try {
-            const response = await fetch('/api/ai/greet');  // Updated path to /api/ai
+            const response = await fetch('/api/ai/greet');  // Updated to match route changes
             const data = await response.json();
+            
             if (data.status === 'success') {
-                consoleDiv.innerHTML += `<div>AI: ${data.result}</div>`;
+                const aiResponse = data.result;
+                displayAIResponse(aiResponse);
             } else {
                 consoleDiv.innerHTML += `<div>Error retrieving greeting: ${data.error}</div>`;
             }
@@ -25,7 +27,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const command = commandInput.value;
         if (command) {
             try {
-                const response = await fetch('/api/ai/command', {
+                const response = await fetch('/api/ai/command', {  // Updated API path
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ command })
@@ -41,19 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 if (data.status === 'success') {
                     const aiResponse = data.result;
-                    
-                    // Check if response is an array or object and loop through it
-                    if (Array.isArray(aiResponse)) {
-                        aiResponse.forEach(item => {
-                            consoleDiv.innerHTML += `<div>AI: ${JSON.stringify(item, null, 2)}</div>`;
-                        });
-                    } else if (typeof aiResponse === 'object') {
-                        for (const [key, value] of Object.entries(aiResponse)) {
-                            consoleDiv.innerHTML += `<div>AI: ${key}: ${value}</div>`;
-                        }
-                    } else {
-                        consoleDiv.innerHTML += `<div>AI: ${aiResponse}</div>`;
-                    }
+                    displayAIResponse(aiResponse);
                 } else {
                     consoleDiv.innerHTML += `<div>Error: ${data.error}</div>`;
                 }
@@ -66,7 +56,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
     
-    
+    // Helper function to display AI responses
+    function displayAIResponse(aiResponse) {
+        if (Array.isArray(aiResponse)) {
+            aiResponse.forEach(item => {
+                if (item && typeof item === 'object') {
+                    // Pretty print JSON if the response is an object
+                    consoleDiv.innerHTML += `<div>AI: ${JSON.stringify(item, null, 2)}</div>`;
+                } else {
+                    consoleDiv.innerHTML += `<div>AI: ${item}</div>`;
+                }
+            });
+        } else if (typeof aiResponse === 'object') {
+            // Handle object response
+            for (const [key, value] of Object.entries(aiResponse)) {
+                consoleDiv.innerHTML += `<div>AI: ${key}: ${value}</div>`;
+            }
+        } else {
+            // Simple string response
+            consoleDiv.innerHTML += `<div>AI: ${aiResponse}</div>`;
+        }
+    }
 
     // Event listeners for button click and enter key
     sendBtn.addEventListener("click", sendCommand);

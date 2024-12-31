@@ -1,9 +1,10 @@
 # ai-agent-setup
  
 Deploy VM
-SSH into VM OR .bootstrap.sh into VM w/ IP and API Key
+SSH into VM OR .bootstrap.sh into VM w/ IP and API Key from Host
 Git clone repo down 
 Chmod any necessary files
+Run setup_ai_agent.sh w/ the API Key
 
 rm -rf ./ai-agent-setup
 git clone https://github.com/jw-wcv/ai-agent-setup.git

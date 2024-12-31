@@ -70,12 +70,13 @@ async function addMessageToThread(req, res) {
 // Run Thread
 async function runThread(req, res) {
     try {
-        const { assistantId } = req.body;
-        const threadId = await aiServices.getOrCreateThread(assistantId);
-        const result = await aiServices.runThread(threadId);
-        res.json({ message: 'Thread executed', result });
+        const { threadId, assistantId } = req.body;
+        const result = await aiServices.runThread(threadId, assistantId);
+
+        res.json({ message: 'Thread run successfully', result });
     } catch (error) {
-        res.status(500).json({ error: 'Failed to run thread' });
+        console.error('Error running thread:', error);
+        res.status(500).json({ error: 'Error running thread' });
     }
 }
 

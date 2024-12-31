@@ -91,22 +91,58 @@ async function addMessageToThread(threadId, message) {
 }
 
 // Run thread to get assistant response
-async function runThread(threadId) {
-    const assistantId = await ensureAssistant();
-    const run = await openaiClient.beta.threads.runs.create(threadId, {
-        assistant_id: assistantId
-    });
+async function runThread(threadId, assistantId) {
+    try {
+        const runResponse = await openaiClient.beta.threads.runs.create(threadId, {
+            assistant_id: assistantId,
+        });
 
-    if (!run || !run.id) throw new Error('Failed to start thread.');
+        console.log(`Thread started. Run ID: ${runResponse.id}`);
 
-    console.log(`Thread started. Run ID: ${run.id}`);
-    return run;
+        // Retrieve the run until completion
+        const finalRun = await waitForRunCompletion(threadId, runResponse.id);
+        
+        if (finalRun.status === 'completed') {
+            const messages = await getThreadMessages(threadId);
+            return messages;
+        } else {
+            throw new Error(`Run did not complete successfully: ${finalRun.status}`);
+        }
+    } catch (error) {
+        console.error('Error running thread:', error);
+        throw new Error('Failed to run thread.');
+    }
+}
+
+// Polling function to wait for thread completion
+async function waitForRunCompletion(threadId, runId) {
+    let status = 'queued';
+    let runDetails;
+
+    while (status === 'queued' || status === 'in_progress') {
+        runDetails = await openaiClient.beta.threads.runs.retrieve(threadId, runId);
+        console.log(`Run status: ${runDetails.status}`);
+
+        status = runDetails.status;
+
+        if (status === 'completed') {
+            return runDetails;
+        } else if (status !== 'in_progress' && status !== 'queued') {
+            throw new Error(`Run failed with status: ${status}`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
 }
 
 // Retrieve thread messages
 async function getThreadMessages(threadId) {
     const response = await openaiClient.beta.threads.messages.list(threadId);
-    return response.data;
+    const messages = response.data.map((message) => {
+        return message.content.map(content => content.text?.value).join('\n');
+    }).join('\n\n');
+
+    console.log("Thread Messages:\n", messages);
+    return messages || 'No messages found.';
 }
 
 async function handleCommand(req, res) {
