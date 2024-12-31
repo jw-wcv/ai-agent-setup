@@ -1,29 +1,8 @@
-// dbServices.js
-
 const mongoose = require('mongoose');
 const AgentThread = require('../database/models/AgentThread.js');
 const Ticket = require('../database/models/Ticket.js');
 const aiServices = require('./aiServices');
 const { ObjectId } = require('mongoose').Types;
-
-// Database Connection
-const dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017/agent';
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
-
-const db = mongoose.connection;
-
-db.on('connected', () => {
-    console.log(`MongoDB connected at ${dbURI}`);
-});
-
-db.on('error', (err) => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-});
-
-db.on('disconnected', () => {
-    console.log('MongoDB disconnected');
-});
 
 // Utility to Dynamically Fetch Model by Name
 async function getRecordsByModelName(modelName, query = {}) {
@@ -188,7 +167,6 @@ async function createAgentThread(taskDescription, agentName) {
 }
 
 module.exports = {
-    db,
     getRecordsByModelName,
     deleteRecordsByModelName,
     findRecordById,
