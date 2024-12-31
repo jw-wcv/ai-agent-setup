@@ -7,8 +7,9 @@ const { connectToDB } = require('./config/dbConfig');
 const { whitelistMiddleware } = require('./middleware/whitelistMiddleware');
 
 // Import Route Files
-const aiRoutes = require('./routes/aiRoutes');  // Correct import
+const aiRoutes = require('./routes/aiRoutes');  
 const databaseRoutes = require('./routes/dbRoutes');
+const agentRoutes = require('./routes/agentRoutes');
 
 // Define models here 
 const ServiceManager = require('./services/service_manager.js');
@@ -39,6 +40,7 @@ app.get('/', (req, res) => {
 // Mount API Routes (AI and Database)
 app.use('/api/database', databaseRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/agents', agentRoutes);
 
 // Real-time Log Streaming (syslog)
 app.get('/vm-log-stream', (req, res) => {

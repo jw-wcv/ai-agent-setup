@@ -16,9 +16,9 @@ function configureWebSocket(server) {
     wss.on('connection', (ws) => {
         console.log('WebSocket connection established.');
         
-        ws.on('message', (message) => {
-            console.log('Received:', message);
-            ws.send(`Echo: ${message}`);
+        ws.on('message', async (message) => {
+            const response = await aiServices.processCommand(message);
+            ws.send(response);
         });
 
         ws.on('close', () => {
