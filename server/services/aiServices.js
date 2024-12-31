@@ -196,5 +196,6 @@ module.exports = {
     addMessageToThread,
     runThread,
     getThreadMessages,
-    handleCommand
+    handleCommand,
+    ensureAssistant
 };
