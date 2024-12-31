@@ -28,21 +28,19 @@ body, html {
 
 /* Main CRT Display (Larger Center) */
 .monitor-frame {
-    flex-grow: 3;  /* Make this section expand more */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-end;
     height: 100%;
     background: #111;
     border: 15px solid #333;
     border-radius: 12px;
-    padding: 20px;
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
     overflow: hidden;
 }
 
 .crt {
-    flex-grow: 1;  /* Fills remaining space */
+    flex-grow: 1;  /* Make the console fill vertical space */
     width: 100%;
     background: #000;
     border-radius: 6px;
@@ -65,13 +63,13 @@ body, html {
 
 
 /* Command Bar */
-/* Command Input (Fixed to Bottom of CRT) */
 .command-input {
     display: flex;
     padding: 15px;
     background-color: #222;
     border-top: 3px solid #0f0;
     box-shadow: 0 -3px 15px rgba(0, 255, 0, 0.2);
+    flex-shrink: 0;  /* Prevent shrinking */
 }
 
 .command-input input {
