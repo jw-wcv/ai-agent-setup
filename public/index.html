@@ -7,23 +7,38 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>AI Agent Console</h1>
-        
-        <div class="main-panel">
-            <!-- Left: Chat Console -->
-            <div class="left-panel">
-                <div id="console" class="console"></div>
+    <div class="desk-container">
+        <div class="monitor-frame">
+            <div class="crt">
+                <div class="console" id="console"></div>
                 <div class="command-input">
                     <input type="text" id="command" placeholder="Type your message..." autofocus>
                     <button id="sendBtn">Send</button>
                 </div>
             </div>
-            
-            <!-- Right: Activity Monitor -->
-            <div class="right-panel">
-                <h2>Activity Monitor</h2>
-                <div id="activity-feed" class="activity-feed"></div>
+        </div>
+
+        <div class="side-panel">
+            <!-- Agent Avatar -->
+            <div class="agent-avatar">
+                <img src="avatar.png" alt="Agent Avatar">
+                <div class="status">Awaiting Command...</div>
+            </div>
+
+            <!-- To-Do List -->
+            <div class="todo-list">
+                <h2>Task List</h2>
+                <ul id="taskList">
+                    <li>No tasks yet...</li>
+                </ul>
+            </div>
+
+            <!-- Activity Feed -->
+            <div class="activity-feed">
+                <h2>Activity Logs</h2>
+                <div id="activityLogs">
+                    <p>System Initialization...</p>
+                </div>
             </div>
         </div>
     </div>
