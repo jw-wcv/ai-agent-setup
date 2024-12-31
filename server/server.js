@@ -59,7 +59,7 @@ app.get('/vm-log-stream', (req, res) => {
 });
 
 // Endpoint to list all available services
-app.post('/api/list-services', authenticateToken, async (req, res) => {
+app.post('/api/list-services', async (req, res) => {
     try {
         const services = serviceManager.listAllServices();
         res.json({ services });
