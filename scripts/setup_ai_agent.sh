@@ -160,7 +160,7 @@ if [ -f "package.json" ]; then
 
     log_message "Dependencies installed. Starting server with PM2..."
     log_message "Ensuring PM2 process for AI Agent is running..."
-    pm2 describe ai-agent-server > /dev/null
+    pm2 list | grep -q ai-agent-server
     if [ $? -eq 0 ]; then
         log_message "AI Agent server already running. Restarting..."
         pm2 restart ai-agent-server
