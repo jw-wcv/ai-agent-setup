@@ -189,18 +189,25 @@ async function handleCommand(req, res) {
         const runResult = await aiServices.runThread(threadId, assistantId);
         
         // Get the latest messages from the thread
-        const messages = await aiServices.getThreadMessages(threadId);
+        const messages = await aiServices.getThreadMessages(threadId) || [];
+        console.log('Thread messages:', messages);
+
+        // Ensure messages is an array before filtering
+        const filteredMessages = Array.isArray(messages)
+            ? messages.filter(msg => !msg.includes("assist you today"))
+            : [];
+
+        const latestMessage = filteredMessages.length > 0
+            ? filteredMessages[filteredMessages.length - 1]
+            : 'Command executed successfully.';
         
-        // Filter out repetitive greetings
-        const filteredMessages = messages.filter(msg => !msg.includes("assist you today"));
-        
-        const latestMessage = filteredMessages[filteredMessages.length - 1] || 'Command executed successfully.';
         res.json({ status: 'success', result: latestMessage });
     } catch (error) {
         console.error('Error processing command:', error);
         res.status(500).json({ error: 'Failed to process command' });
     }
 }
+
 
 
 
