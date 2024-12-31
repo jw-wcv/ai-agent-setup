@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Greet the user immediately when the page loads
     window.onload = async function() {
         try {
-            const response = await fetch('/greet');
+            const response = await fetch('/api/ai/greet');  // Updated path to /api/ai
             const data = await response.json();
             if (data.status === 'success') {
                 consoleDiv.innerHTML += `<div>AI: ${data.result}</div>`;
@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     async function sendCommand() {
         const command = commandInput.value;
         if (command) {
-            const response = await fetch('/command', {
+            const response = await fetch('/api/ai/command', {  // Updated path to /api/ai
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ command })
