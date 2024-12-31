@@ -5,8 +5,8 @@ const path = require('path');
 const os = require('os');
 const { spawn } = require('child_process');
 const { OpenAIApi, OpenAI } = require('openai');
-const db = require('./server/services/dbServices'); 
-const Assistant = require('./server/database/models/Assistant');
+const db = require('./services/dbServices'); 
+const Assistant = require('./database/models/Assistant');
 const { 
     doCompletion, 
     createAssistant, 
@@ -14,13 +14,13 @@ const {
     addMessageToThread, 
     runThread, 
     getThreadMessages 
-} = require('./server/services/aiServices');
+} = require('./services/aiServices');
 
 const app = express();
 app.use(express.json());
 
 // Paths
-const configPath = process.env.CONFIG_DIR || '/root/ai-agent-setup/config';
+const configPath = process.env.CONFIG_DIR || '/root/ai-agent-setup/server/config';
 const whitelistPath = `${configPath}/ipwhitelist.txt`;
 
 // OpenAI API Configuration
