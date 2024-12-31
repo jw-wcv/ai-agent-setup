@@ -148,6 +148,22 @@ done < "$ALLOWED_IPS_FILE"
 mv "$VALID_IPS" "$ALLOWED_IPS_FILE"
 yes | sudo ufw enable
 
+log_message "Building React client..."
+cd "$FILES_DIR/client"
+
+if [ -f "package.json" ]; then
+    npm install
+    npm run build || {
+        log_message "React build failed. Exiting."
+        exit 1
+    }
+else
+    log_message "React package.json not found. Skipping client build."
+fi
+
+log_message "Client build complete."
+
+
 log_message "Starting AI Agent server..."
 
 cd "$FILES_DIR"

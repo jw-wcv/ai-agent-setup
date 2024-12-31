@@ -1,0 +1,424 @@
+/* General Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Courier New', monospace;
+  background-color: #1e1e1e;
+  color: #fff;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Main Layout (Flexbox for Consistent Sidebar Behavior) */
+.desk-container {
+  display: flex;
+  justify-content: space-between;
+  height: 100vh;
+  padding: 20px;
+  gap: 20px;
+  overflow: hidden;
+}
+
+/* Left and Right Sidebar */
+.left-sidebar, .right-sidebar {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 25%; /* Flex-grow, flex-shrink, flex-basis */
+  gap: 20px;
+  max-width: 400px;  /* Prevent excessive growth */
+  overflow-y: auto;  /* Allow scrolling if needed */
+}
+
+/* Main CRT Monitor */
+.monitor-frame {
+  display: flex;
+  flex-direction: column;
+  flex: 2 1 50%;
+  justify-content: space-between;
+  height: 100%;
+  background: #111;
+  border: 15px solid #333;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
+  overflow: hidden;
+  max-width: 800px;  /* Prevent excessive stretching */
+}
+
+/* CRT Screen */
+.crt {
+  flex-grow: 1;  
+  width: 100%;
+  background: #000;
+  border-radius: 6px;
+  overflow-y: auto;
+  box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.8);
+  color: #0f0;
+  font-size: 18px;
+  padding: 15px;
+}
+
+.console {
+  height: 85%;
+  padding: 15px;
+  overflow-y: auto;
+  font-size: 18px;
+  color: #0f0;
+}
+
+/* Command Bar */
+.command-input {
+  display: flex;
+  padding: 10px;
+  background-color: #222;
+  border-top: 3px solid #0f0;
+}
+
+.command-input input {
+  flex-grow: 1;
+  background: #000;
+  border: none;
+  color: #0f0;
+  font-size: 16px;
+  padding: 5px;
+}
+
+.command-input button {
+  background: #0f0;
+  border: none;
+  color: #000;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.command-input button:hover {
+  background: #5f5;
+}
+
+/* Avatar Section */
+.agent-avatar {
+  text-align: center;
+  background: #222;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  animation: avatarGlow 5s infinite alternate;
+}
+
+.agent-avatar img {
+  width: 140px;
+  border-radius: 50%;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #0f0;
+}
+
+/* Health Bar */
+.health-bar {
+  width: 100%;
+  height: 20px;
+  background: #300;
+  border: 1px solid #900;
+  margin-top: 15px;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.health-fill {
+  height: 100%;
+  width: 100%;
+  background: #0f0;
+  transition: width 0.5s ease-in-out;
+}
+
+/* Wallet Section */
+.wallet-section {
+  background: #333;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.wallet-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
+  margin-top: 15px;
+}
+
+.wallet-item {
+  width: 60px;
+  height: 60px;
+  background: #111;
+  border: 1px solid #5f5;
+  box-shadow: inset 0 0 10px rgba(0, 255, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #5f5;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.wallet-item:hover {
+  background: #0a0;
+}
+
+/* Trending Board */
+.trending-board {
+  margin-top: 30px;
+  background: #333;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+  flex: 1;
+  min-height: 200px;
+}
+
+/* Input and Button Flex */
+.post-input {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.post-input input {
+  flex-grow: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #5f5;
+  background: #000;
+  color: #0f0;
+  border-radius: 5px;
+}
+
+.post-input button {
+  background: #5f5;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  color: #000;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.posts {
+  margin-top: 15px;
+  overflow-y: auto;
+  max-height: 300px; /* Prevent infinite growth */
+}
+
+.post {
+  background: #222;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  border: 1px solid #555;
+}
+
+/* Task Tree */
+.task-tree {
+  flex: 1;
+  background: #333;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+  overflow-y: auto;
+  min-height: 200px;
+}
+
+.task-tree ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.task-tree li {
+  margin: 8px 0;
+}
+
+.task-tree li ul {
+  margin-top: 5px;
+  padding-left: 25px;
+  border-left: 1px solid #0f0;
+}
+
+/* Skill Tree Section */
+.skill-tree {
+  background: #333;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+  flex: 1;
+  min-height: 250px;
+}
+
+.skills-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.skill-branch {
+  flex: 1 1 45%;
+  text-align: center;
+  margin: 10px;
+  min-width: 200px;
+}
+
+.skill-branch h3 {
+  margin-bottom: 15px;
+}
+
+.skill-branch ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.skill-branch li {
+  margin: 15px 0;
+  padding: 12px;
+  background: #222;
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+/* Unlock Button */
+.unlock-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: #0f0;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.unlock-btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+/* To-Do List Section */
+.todo-list {
+  background: #333;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+  flex: 1;
+  min-height: 250px;
+  overflow-y: auto;
+}
+
+.todo-list h2 {
+  margin-bottom: 15px;
+}
+
+.todo-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.todo-list li {
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  background: #222;
+  border: 1px solid #555;
+  transition: background 0.3s ease-in;
+}
+
+.todo-list li:hover {
+  background: #3a3a3a;
+}
+
+/* Activity Log */
+#activityLogs {
+  height: 200px;
+  overflow-y: auto;
+  background: #111;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+
+
+
+/* Glowing Effects */
+@keyframes monitorGlow {
+  from {
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  }
+  to {
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+  }
+}
+
+@keyframes avatarGlow {
+  from {
+      box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  }
+  to {
+      box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+  }
+}
+
+
+
+
+
+
+/* Responsive Sidebar and Monitor Layouts */
+@media (max-width: 1200px) {
+  .desk-container {
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+  }
+
+  .left-sidebar, .right-sidebar {
+      flex: none;
+      width: 100%;
+  }
+
+  .monitor-frame {
+      width: 100%;
+  }
+
+  .skills-container {
+      flex-direction: column;
+  }
+
+  .skill-branch {
+      flex: none;
+      width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .desk-container {
+      flex-direction: column;
+      overflow-y: auto;
+  }
+
+  .left-sidebar, .right-sidebar {
+      width: 100%;
+      order: 2;
+  }
+
+  .monitor-frame {
+      order: 1;
+      height: 60vh;
+  }
+
+  .skills-container {
+      flex-direction: column;
+      align-items: center;
+  }
+}

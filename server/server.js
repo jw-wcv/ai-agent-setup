@@ -28,13 +28,19 @@ connectToDB();
 app.use(whitelistMiddleware);
 
 // Static File Serving (Ensure public directory)
-const publicDir = path.join(__dirname, '../public');
-app.use(express.static(publicDir));
+// const publicDir = path.join(__dirname, '../public');
+const clientBuildPath = path.join(__dirname, '../client/build');
+app.use(express.static(clientBuildPath));
 
 // Root Route (Serve index.html)
 app.get('/', (req, res) => {
     console.log('Serving index.html');
-    res.sendFile(path.join(publicDir, 'index.html'));
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+});
+
+// Handle All React Routes (SPA Support)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
 // Mount API Routes (AI and Database)
@@ -70,8 +76,9 @@ app.post('/api/list-services', async (req, res) => {
   });
 
 // Start Server
-const server = app.listen(8080, () => {
-    console.log('Server running on port 8080');
+const PORT = process.env.PORT || 8080;
+const server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
 
 // WebSocket Setup (Optional)

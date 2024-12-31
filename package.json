@@ -1,10 +1,14 @@
 {
   "name": "ai-agent-server",
   "version": "1.0.0",
-  "description": "AI Agent VM Node.js server",
+  "description": "AI Agent VM",
   "main": "server/server.js",
   "scripts": {
-    "start": "node server/server.js"
+    "server": "node ./server/server.js",
+    "client": "npm start --prefix ./client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm run build --prefix ./client",
+    "start": "npm run build && node ./server/server.js"
   },
   "dependencies": {
     "express": "^4.17.1",
