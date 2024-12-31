@@ -56,15 +56,27 @@
                 const data = await response.json();
                 
                 consoleDiv.innerHTML += `<div>User: ${command}</div>`;
+                
                 if (data.status === 'success') {
-                    consoleDiv.innerHTML += `<div>AI: ${data.result}</div>`;
+                    // Fix: Extract message from OpenAI response
+                    const aiResponse = data.result;
+        
+                    // If the response is an object, extract the 'content' properly
+                    if (aiResponse && aiResponse.choices) {
+                        const message = aiResponse.choices[0].message.content || 'No response';
+                        consoleDiv.innerHTML += `<div>AI: ${message}</div>`;
+                    } else {
+                        consoleDiv.innerHTML += `<div>AI: ${JSON.stringify(aiResponse)}</div>`;
+                    }
                 } else {
                     consoleDiv.innerHTML += `<div>Error processing command.</div>`;
                 }
+        
                 commandInput.value = '';
                 consoleDiv.scrollTop = consoleDiv.scrollHeight;
             }
         }
+        
 
         // Allow pressing Enter to send command
         commandInput.addEventListener("keypress", function(e) {

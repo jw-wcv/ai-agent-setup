@@ -99,15 +99,17 @@ app.get('/', (req, res) => {
 app.get('/vm-log-stream', (req, res) => {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
 
-    const stream = spawn('tail', ['-f', '/var/log/syslog']);
+    const sendUpdate = (log) => {
+        res.write(`data: ${log}\n\n`);
+    };
 
-    stream.stdout.on('data', (data) => {
-        res.write(`data: ${data.toString()}\n\n`);
-    });
+    sseClients.push(res);
 
     req.on('close', () => {
-        stream.kill();
+        const index = sseClients.indexOf(res);
+        if (index !== -1) sseClients.splice(index, 1);
     });
 });
 
