@@ -147,13 +147,17 @@ async function greetUser(req, res) {
         const messages = await aiServices.getThreadMessages(threadId) || [];
         console.log('Thread messages:', messages);
 
+        // Use regex to detect a greeting more flexibly
+        const greetingRegex = /assist|help|support/i;
         const alreadyGreeted = Array.isArray(messages) &&
-                               messages.some(msg => msg.includes("assist you today"));
+                               messages.some(msg => greetingRegex.test(msg));
 
         if (!alreadyGreeted) {
             const greetingPrompt = "Greet the user and ask how you can help today.";
             await aiServices.addMessageToThread(threadId, greetingPrompt);
             await aiServices.runThread(threadId, assistantId);
+        } else {
+            console.log('Greeting already exists. Skipping...');
         }
 
         const latestMessage = Array.isArray(messages) && messages.length > 0
@@ -166,6 +170,7 @@ async function greetUser(req, res) {
         res.status(500).json({ error: 'Failed to process greeting' });
     }
 }
+
 
 
 
