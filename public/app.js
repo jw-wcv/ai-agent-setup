@@ -41,7 +41,19 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 if (data.status === 'success') {
                     const aiResponse = data.result;
-                    consoleDiv.innerHTML += `<div>AI: ${aiResponse}</div>`;
+                    
+                    // Check if response is an array or object and loop through it
+                    if (Array.isArray(aiResponse)) {
+                        aiResponse.forEach(item => {
+                            consoleDiv.innerHTML += `<div>AI: ${JSON.stringify(item, null, 2)}</div>`;
+                        });
+                    } else if (typeof aiResponse === 'object') {
+                        for (const [key, value] of Object.entries(aiResponse)) {
+                            consoleDiv.innerHTML += `<div>AI: ${key}: ${value}</div>`;
+                        }
+                    } else {
+                        consoleDiv.innerHTML += `<div>AI: ${aiResponse}</div>`;
+                    }
                 } else {
                     consoleDiv.innerHTML += `<div>Error: ${data.error}</div>`;
                 }
@@ -53,6 +65,7 @@ document.addEventListener("DOMContentLoaded", function () {
             consoleDiv.scrollTop = consoleDiv.scrollHeight;
         }
     }
+    
     
 
     // Event listeners for button click and enter key
