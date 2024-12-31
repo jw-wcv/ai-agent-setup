@@ -146,7 +146,7 @@ while read -r ip; do
 done < "$ALLOWED_IPS_FILE"
 
 mv "$VALID_IPS" "$ALLOWED_IPS_FILE"
-sudo ufw enable
+yes | sudo ufw enable
 
 log_message "Starting AI Agent server..."
 
