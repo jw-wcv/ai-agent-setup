@@ -190,11 +190,15 @@ async function handleCommand(req, res) {
         // Extract and clean the message content
         if (Array.isArray(messages.data)) {
             messages = messages.data.map(msg => {
+                if (typeof msg === 'string') {
+                    return msg;  // Handle direct string messages
+                }
                 return msg.content?.map(c => c.text?.value).join('\n') || msg.text?.value || '';
             }).filter(Boolean);
         } else {
             messages = [];
         }
+        
 
         console.log(`📜 Cleaned Messages (count: ${messages.length}):`, messages);
 
