@@ -35,15 +35,19 @@ const openai = new OpenAI({ apiKey });
 let currentThreadId = null;
 
 // Create or resume an AI conversation thread
+// Ensure thread exists or create one
 async function getOrCreateThread() {
     if (!currentThreadId) {
         const thread = await createThread();
-        currentThreadId = thread.id;
-        console.log(`New thread created: ${currentThreadId}`);
+        if (thread && thread.id) {
+            currentThreadId = thread.id;
+            console.log(`New thread created: ${currentThreadId}`);
+        } else {
+            throw new Error("Failed to create thread.");
+        }
     }
     return currentThreadId;
 }
-
 // Helper to normalize IP addresses (IPv4-mapped IPv6)
 const formatIP = (ip) => (ip.includes('::ffff:') ? ip.split('::ffff:')[1] : ip);
 

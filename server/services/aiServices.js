@@ -136,23 +136,27 @@ async function addMessageToThread(threadId, message) {
 
 // Updated to call ensureAssistant()
 async function runThread(threadId) {
-    const assistantId = await ensureAssistant();  // Ensure an assistant is loaded
+    const assistantId = await ensureAssistant();
     const run = await openaiClient.beta.threads.runs.create(threadId, {
         assistant_id: assistantId,
     });
 
+    if (!run || !run.id) {
+        throw new Error(`Failed to start thread. No run ID returned.`);
+    }
+
     console.log(`Thread started. Run ID: ${run.id}`);
 
-    // Poll the run until it's completed
     let runStatus = await openaiClient.beta.threads.runs.retrieve(run.id);
     while (runStatus.status === "queued" || runStatus.status === "in_progress") {
-        await new Promise(resolve => setTimeout(resolve, 1000));  // Wait 1 second
+        await new Promise(resolve => setTimeout(resolve, 1000));  // Poll every 1 second
         runStatus = await openaiClient.beta.threads.runs.retrieve(run.id);
     }
 
     console.log(`Run completed. Status: ${runStatus.status}`);
     return runStatus;
 }
+
 
 
 // Retrieve thread messages
@@ -169,29 +173,23 @@ async function getThreadMessages(threadId) {
     }
 }
 
-
-// Enhanced command handler
+// Force run on the correct thread
 async function handleCommand(command) {
-    const threadId = await ensureThread();  // Ensure a thread exists or create one
-    await addMessageToThread(threadId, command);  // Add user message to thread
+    const threadId = await getOrCreateThread();
+    await addMessageToThread(threadId, command);
     
-    // Explicitly run the thread
-    const runResponse = await runThread(threadId);  
-
+    const runResponse = await runThread(threadId);  // Ensure correct thread ID is used
     if (!runResponse || !runResponse.id) {
         throw new Error("Failed to run thread.");
     }
 
-    // Wait for the thread to complete processing
     const messages = await getThreadMessages(threadId);
-    const latestMessage = messages[messages.length - 1];  // Fetch latest assistant message
+    const latestMessage = messages[messages.length - 1];
 
-    // Debugging: Log entire message object
     console.log("Latest AI Response Object:", JSON.stringify(latestMessage, null, 2));
 
     let responseText = '';
 
-    // Extract assistant's response (filter out user messages)
     if (latestMessage && latestMessage.role === 'assistant' && latestMessage.content) {
         latestMessage.content.forEach(item => {
             if (item.type === 'text' && item.text && item.text.value) {
