@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Use CONFIG_DIR from .env or fallback to default
-const configPath = process.env.CONFIG_DIR || path.join(__dirname, '../../config');
+const configPath = process.env.CONFIG_DIR || path.join(__dirname, '../../server/config');
 const keysPath = path.join(configPath, 'keys/api_key.txt');
 
 let apiKey;
