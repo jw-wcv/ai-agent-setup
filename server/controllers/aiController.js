@@ -150,10 +150,10 @@ async function greetUser(req, res) {
         if (!alreadyGreeted) {
             const greetingPrompt = "Greet the user and ask how you can help today.";
             await aiServices.addMessageToThread(threadId, greetingPrompt);
-            await aiServices.runThread(threadId);
+            await aiServices.runThread(threadId, assistantId);
         }
 
-        const latestMessage = messages[messages.length - 1]?.content || "Hello! How can I assist you today?";
+        const latestMessage = messages[messages.length - 1] || "Hello! How can I assist you today?";
         res.json({ status: 'success', result: latestMessage });
     } catch (err) {
         console.error('Error during greeting:', err.message);
@@ -163,18 +163,38 @@ async function greetUser(req, res) {
 
 
 
+
 async function handleCommand(req, res) {
     const { command } = req.body;
 
+    if (!command) {
+        return res.status(400).json({ error: 'No command provided' });
+    }
+
     try {
-        const result = await aiServices.processCommand(command);
-        await aiServices.clearThread(result.threadId);  // Clear thread after running
-        res.json({ status: 'success', result });
+        const assistantId = await aiServices.ensureAssistant();
+        const threadId = await aiServices.getOrCreateThread(assistantId);
+
+        // Add the user command to the thread
+        await aiServices.addMessageToThread(threadId, command);
+        
+        // Run the thread and wait for the response
+        const runResult = await aiServices.runThread(threadId, assistantId);
+        
+        // Get the latest messages from the thread
+        const messages = await aiServices.getThreadMessages(threadId);
+        
+        // Filter out repetitive greetings
+        const filteredMessages = messages.filter(msg => !msg.includes("assist you today"));
+        
+        const latestMessage = filteredMessages[filteredMessages.length - 1] || 'Command executed successfully.';
+        res.json({ status: 'success', result: latestMessage });
     } catch (error) {
         console.error('Error processing command:', error);
         res.status(500).json({ error: 'Failed to process command' });
     }
 }
+
 
 
 

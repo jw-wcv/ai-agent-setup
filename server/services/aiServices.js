@@ -84,11 +84,29 @@ async function createThread() {
 
 // Add message to thread
 async function addMessageToThread(threadId, message) {
-    return await openaiClient.beta.threads.messages.create(threadId, {
-        role: "user",
-        content: message
-    });
+    try {
+        const existingMessages = await getThreadMessages(threadId);
+
+        // Check for existing greeting to prevent duplication
+        const alreadyGreeted = existingMessages.some(msg => msg.includes("assist you today"));
+
+        if (alreadyGreeted && message.includes("assist you today")) {
+            console.log('Skipping duplicate greeting.');
+            return;
+        }
+
+        const response = await openaiClient.beta.threads.messages.create(threadId, {
+            role: "user",
+            content: message,
+        });
+
+        return response;
+    } catch (error) {
+        console.error('Error adding message to thread:', error);
+        throw new Error('Failed to add to the thread.');
+    }
 }
+
 
 // Run thread to get assistant response
 async function runThread(threadId, assistantId) {
@@ -165,8 +183,15 @@ async function processCommand(command) {
 }
 
 async function clearThread(threadId) {
-    await openaiClient.beta.threads.archive(threadId);
+    try {
+        const response = await openaiClient.beta.threads.archive(threadId);
+        console.log(`Thread ${threadId} archived successfully.`);
+        return response;
+    } catch (error) {
+        console.error('Error clearing thread:', error);
+    }
 }
+
 
 module.exports = {
     processCommand,
