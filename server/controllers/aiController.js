@@ -137,6 +137,26 @@ async function getCompletion(req, res) {
     }
 }
 
+// New greetUser Controller
+async function greetUser(req, res) {
+    try {
+        const assistantId = await aiServices.ensureAssistant();
+        const threadId = await aiServices.getOrCreateThread(assistantId);
+
+        const greetingPrompt = "Greet the user and ask how you can help today.";
+        await aiServices.addMessageToThread(threadId, greetingPrompt);
+        await aiServices.runThread(threadId);
+
+        const messages = await aiServices.getThreadMessages(threadId);
+        const latestMessage = messages[messages.length - 1]?.content || "Hello! How can I assist you today?";
+
+        res.json({ status: 'success', result: latestMessage });
+    } catch (err) {
+        console.error('Error during greeting:', err.message);
+        res.status(500).json({ error: 'Failed to process greeting' });
+    }
+}
+
 module.exports = {
     createAgent,
     listAssistants,
@@ -149,5 +169,6 @@ module.exports = {
     getThreadTranscript,
     uploadFile,
     uploadFileByPath,
-    getCompletion
+    getCompletion,
+    greetUser
 };

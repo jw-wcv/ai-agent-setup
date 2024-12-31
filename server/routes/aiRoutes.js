@@ -27,4 +27,7 @@ router.post('/upload-file', aiController.uploadFile);
 // Prompt Completion Route
 router.post('/get-completion', aiController.getCompletion);
 
+// Greet Route
+router.get('/greet', aiController.greetUser);  // Add new route for greeting
+
 module.exports = router;
