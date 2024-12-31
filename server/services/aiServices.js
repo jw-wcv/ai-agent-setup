@@ -145,38 +145,33 @@ async function getThreadMessages(threadId) {
     return messages || 'No messages found.';
 }
 
-async function handleCommand(req, res) {
-    const { command } = req.body;
 
+async function processCommand(command) {
     if (!command) {
-        return res.status(400).json({ error: 'No command provided' });
+        throw new Error('No command provided');
     }
 
-    try {
-        const assistantId = await aiServices.ensureAssistant();
-        const threadId = await aiServices.getOrCreateThread(assistantId);
+    const assistantId = await ensureAssistant();
+    const threadId = await getOrCreateThread(assistantId);
 
-        // Add the user command to the thread
-        await aiServices.addMessageToThread(threadId, command);
-        const runResult = await aiServices.runThread(threadId);
-        
-        // Get the latest messages from the thread
-        const messages = await aiServices.getThreadMessages(threadId);
-        const latestMessage = messages[messages.length - 1]?.content || 'Command executed successfully.';
+    // Add the user command to the thread
+    await addMessageToThread(threadId, command);
+    await runThread(threadId, assistantId);
 
-        res.json({ status: 'success', result: latestMessage });
-    } catch (error) {
-        console.error('Error processing command:', error);
-        res.status(500).json({ error: 'Failed to process command' });
-    }
+    // Get the latest messages from the thread
+    const messages = await getThreadMessages(threadId);
+    const latestMessage = messages[messages.length - 1]?.content || 'Command executed successfully.';
+
+    return latestMessage;
 }
 
+
 module.exports = {
+    processCommand,
     ensureAssistant,
     getOrCreateThread,
     createThread,
     addMessageToThread,
     runThread,
-    getThreadMessages,
-    handleCommand
+    getThreadMessages
 };
