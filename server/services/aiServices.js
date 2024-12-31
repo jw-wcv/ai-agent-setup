@@ -89,12 +89,12 @@ async function createAssistant(name, instructions, description) {
     try {
         const response = await openaiClient.beta.assistants.create({
             name,
-            instructions,
-            description,
+            instructions: instructions || "You are an AI that helps manage virtual machines and answer user questions.",
+            description: description || "AI agent that interacts with VM tasks.",
             model: 'gpt-4-turbo',
             tools: [ 
                 { type: "code_interpreter" }, 
-                { type: "file_search" }  // Replace retrieval with file_search
+                { type: "file_search" }  // Ensure it's compliant with OpenAI's API.
             ]
         });
         return response;
@@ -103,6 +103,7 @@ async function createAssistant(name, instructions, description) {
         throw error;
     }
 }
+
 
 // Create a new thread
 async function createThread() {
@@ -166,10 +167,26 @@ async function ensureThread() {
 // Enhanced command handler
 async function handleCommand(command) {
     const threadId = await ensureThread();
-    const response = await addMessageToThread(threadId, command);
-    await runThread(threadId);
-    return await getThreadMessages(threadId);
+    await addMessageToThread(threadId, command);
+    const runResponse = await runThread(threadId);
+    
+    if (!runResponse || !runResponse.id) {
+        throw new Error("Failed to run thread.");
+    }
+
+    // Get messages after thread run
+    const messages = await getThreadMessages(threadId);
+    
+    // Extract AI response (latest message)
+    const latestMessage = messages[messages.length - 1];
+    
+    if (latestMessage && latestMessage.content) {
+        return latestMessage.content[0]?.text?.value || "AI did not return a response.";
+    } else {
+        return "No response from AI.";
+    }
 }
+
 
 module.exports = {
     doCompletion,

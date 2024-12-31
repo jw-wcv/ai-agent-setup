@@ -139,16 +139,13 @@ app.post('/command', async (req, res) => {
     }
 
     try {
-        const response = await addMessageToThread(threadId, command);
-        await runThread(threadId);
-        const messages = await getThreadMessages(threadId);
-        
-        const latestMessage = messages[messages.length - 1]?.content || "No response from AI.";
-        res.json({ status: 'success', result: latestMessage });
+        const result = await handleCommand(command);
+        res.json({ status: 'success', result });
     } catch (err) {
         res.status(500).json({ error: 'Failed to process command' });
     }
 });
+
 
 // Create Assistant (Persist in MongoDB)
 app.post('/create-assistant', async (req, res) => {
