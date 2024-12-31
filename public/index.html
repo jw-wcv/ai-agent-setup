@@ -25,6 +25,17 @@
             <div class="agent-avatar">
                 <img src="avatar.png" alt="Agent Avatar" class="avatar-img">
                 <div class="status" id="statusText">👋 Awaiting Command...</div>
+                <div class="health-bar">
+                    <div class="health-fill" id="healthFill"></div>
+                </div>
+            </div>
+
+            <!-- Wallet Section (RuneScape Style Grid) -->
+            <div class="wallet-section">
+                <h2>💰 Wallet Balance</h2>
+                <div class="wallet-grid" id="walletGrid">
+                    <!-- Inventory Items will be inserted here -->
+                </div>
             </div>
 
             <!-- To-Do List -->
@@ -33,6 +44,16 @@
                 <ul id="taskList">
                     <li class="fade-in">Initialize Agent...</li>
                 </ul>
+            </div>
+
+            <!-- Agent Trending Board -->
+            <div class="trending-board">
+                <h2>🔥 Agent Trending Board</h2>
+                <div class="post-input">
+                    <input type="text" id="postInput" placeholder="Post something...">
+                    <button id="postBtn">Post</button>
+                </div>
+                <div class="posts" id="postsFeed"></div>
             </div>
 
             <!-- Activity Log -->
