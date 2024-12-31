@@ -80,7 +80,10 @@ async function createAssistant(name, instructions, description) {
             instructions,
             description,
             model: 'gpt-4-turbo',
-            tools: [{ type: "code_interpreter" }, { type: "retrieval" }]
+            tools: [ 
+                { type: "code_interpreter" }, 
+                { type: "file_search" }  // Replace retrieval with file_search
+            ]
         });
         return response;
     } catch (error) {
