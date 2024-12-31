@@ -144,8 +144,11 @@ async function greetUser(req, res) {
         const assistantId = await aiServices.ensureAssistant();
         const threadId = await aiServices.getOrCreateThread(assistantId);
 
-        const messages = await aiServices.getThreadMessages(threadId);
-        const alreadyGreeted = messages.some(msg => msg.includes("assist you today"));
+        const messages = await aiServices.getThreadMessages(threadId) || [];
+        console.log('Thread messages:', messages);
+
+        const alreadyGreeted = Array.isArray(messages) &&
+                               messages.some(msg => msg.includes("assist you today"));
 
         if (!alreadyGreeted) {
             const greetingPrompt = "Greet the user and ask how you can help today.";
@@ -153,13 +156,17 @@ async function greetUser(req, res) {
             await aiServices.runThread(threadId, assistantId);
         }
 
-        const latestMessage = messages[messages.length - 1] || "Hello! How can I assist you today?";
+        const latestMessage = Array.isArray(messages) && messages.length > 0
+            ? messages[messages.length - 1]
+            : "Hello! How can I assist you today?";
+
         res.json({ status: 'success', result: latestMessage });
     } catch (err) {
         console.error('Error during greeting:', err.message);
         res.status(500).json({ error: 'Failed to process greeting' });
     }
 }
+
 
 
 

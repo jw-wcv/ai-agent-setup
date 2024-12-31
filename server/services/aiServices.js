@@ -85,10 +85,11 @@ async function createThread() {
 // Add message to thread
 async function addMessageToThread(threadId, message) {
     try {
-        const existingMessages = await getThreadMessages(threadId);
+        const existingMessages = await getThreadMessages(threadId) || [];
+        console.log('Existing messages:', existingMessages);
 
-        // Check for existing greeting to prevent duplication
-        const alreadyGreeted = existingMessages.some(msg => msg.includes("assist you today"));
+        const alreadyGreeted = Array.isArray(existingMessages) &&
+                               existingMessages.some(msg => msg.includes("assist you today"));
 
         if (alreadyGreeted && message.includes("assist you today")) {
             console.log('Skipping duplicate greeting.');
@@ -106,6 +107,7 @@ async function addMessageToThread(threadId, message) {
         throw new Error('Failed to add to the thread.');
     }
 }
+
 
 
 // Run thread to get assistant response
