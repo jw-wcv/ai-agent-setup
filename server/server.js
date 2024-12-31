@@ -72,7 +72,7 @@ app.use((req, res, next) => {
 });
 
 // Serve static files
-const publicDir = path.join(__dirname, 'public');
+const publicDir = path.join(__dirname, '../public');
 app.use(express.static(publicDir));
 
 // Serve index.html for the root route
