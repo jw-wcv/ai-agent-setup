@@ -269,3 +269,62 @@ body, html {
     background: #555;
     cursor: not-allowed;
 }
+
+
+/* To-Do List Section */
+.todo-list, .activity-feed {
+    background: #333;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.todo-list h2, .activity-feed h2 {
+    margin-bottom: 15px;
+}
+
+.todo-list ul {
+    list-style: none;
+    padding: 0;
+}
+
+.todo-list li {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    background: #222;
+    border: 1px solid #555;
+    transition: background 0.3s ease-in;
+}
+
+.todo-list li:hover {
+    background: #3a3a3a;
+}
+
+/* Activity Log */
+#activityLogs {
+    height: 200px;
+    overflow-y: auto;
+    background: #111;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* Glowing Effects */
+@keyframes monitorGlow {
+    from {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    }
+    to {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+    }
+}
+
+@keyframes avatarGlow {
+    from {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    }
+    to {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+    }
+}
