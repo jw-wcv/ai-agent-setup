@@ -30,8 +30,8 @@ async function ensureAssistant() {
         if (!assistant) {
             const newAssistant = await createAssistant(
                 "AI Virtual Machine Agent",
-                "You are an AI managing virtual machines. Greet users and perform tasks as instructed.",
-                "AI agent capable of managing VM tasks and responding to user requests."
+                "Manage virtual machines and execute commands as requested by the user.",
+                "AI assistant for managing VM tasks"
             );
             assistant = new AssistantModel({
                 assistantId: newAssistant.id,
@@ -51,6 +51,16 @@ async function ensureAssistant() {
     }
 }
 
+// Ensure Thread Exists
+async function ensureThread() {
+    if (!activeThreadId) {
+        const thread = await createThread();
+        activeThreadId = thread.id;
+    }
+    return activeThreadId;
+}
+
+
 
 // Perform a text completion using OpenAI SDK
 async function doCompletion(prompt, maxTokens = 500, temperature = 0.7) {
@@ -62,19 +72,10 @@ async function doCompletion(prompt, maxTokens = 500, temperature = 0.7) {
             temperature: temperature
         });
 
+        // Extracting the text content properly
         if (response.choices && response.choices.length > 0) {
             const completion = response.choices[0].message.content;
-
-            // Extract only the necessary text parts to simplify front-end handling
-            const parsed = JSON.parse(completion);
-            let finalText = '';
-            parsed.forEach(item => {
-                if (item.text && item.text.value) {
-                    finalText += item.text.value + ' ';
-                }
-            });
-
-            return finalText.trim();
+            return completion;  // Return raw text directly
         } else {
             throw new Error('No response from OpenAI.');
         }
@@ -83,6 +84,7 @@ async function doCompletion(prompt, maxTokens = 500, temperature = 0.7) {
         throw error;
     }
 }
+
 
 
 // Create Assistant with OpenAI
@@ -156,34 +158,23 @@ async function getThreadMessages(threadId) {
     }
 }
 
-// Start or resume thread
-async function ensureThread() {
-    if (!activeThreadId) {
-        const thread = await createThread();
-        activeThreadId = thread.id;
-    }
-    return activeThreadId;
-}
-
 // Enhanced command handler
 async function handleCommand(command) {
     const threadId = await ensureThread();
     await addMessageToThread(threadId, command);
     const runResponse = await runThread(threadId);
-    
+
     if (!runResponse || !runResponse.id) {
         throw new Error("Failed to run thread.");
     }
 
-    // Get messages after thread run
+    // Fetch thread messages after AI processes command
     const messages = await getThreadMessages(threadId);
-    
-    // Extract AI response (latest message)
-    const latestMessage = messages[messages.length - 1];
+    const latestMessage = messages[messages.length - 1];  // Get the last message
 
     let responseText = '';
 
-    // Extract text properly from the content array
+    // Extract the response from content array (content could contain multiple segments)
     if (latestMessage && latestMessage.content) {
         latestMessage.content.forEach(item => {
             if (item.text && item.text.value) {
@@ -192,9 +183,9 @@ async function handleCommand(command) {
         });
     }
 
-    // Return formatted text or fallback
     return responseText.trim() || "AI did not return a response.";
 }
+
 
 
 
