@@ -37,7 +37,7 @@ fi
 
 log_message "Detected local IP: $LOCAL_IP"
 
-# Add local IP to the whitelist if not already present
+# Add local IP to the whitelist if not already present 
 if ! grep -q "$LOCAL_IP" "$IP_WHITELIST_FILE"; then
     log_message "Adding $LOCAL_IP to IP whitelist..."
     echo "$LOCAL_IP" >> "$IP_WHITELIST_FILE"

@@ -2,7 +2,8 @@
 set -e
 
 # Load environment variables
-source /root/ai-agent-setup/.env
+# source /root/ai-agent-setup/.env
+source "$(dirname "$0")/../.env"
 
 KEYS_DIR="$CONFIG_DIR/keys"
 DATA_DIR="$CONFIG_DIR/data"
