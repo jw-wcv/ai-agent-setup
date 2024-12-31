@@ -16,33 +16,37 @@ body, html {
     height: 100vh;
     padding: 20px;
     gap: 20px;
+    overflow: hidden;
 }
 
-/* Left Sidebar */
+/* Left and Right Sidebar */
 .left-sidebar, .right-sidebar {
     display: flex;
     flex-direction: column;
-    flex: 1;  /* Take 1 part of 4 */
-    width: 25%;
+    flex: 1 1 25%; /* Flex-grow, flex-shrink, flex-basis */
     gap: 20px;
+    max-width: 400px;  /* Prevent excessive growth */
+    overflow-y: auto;  /* Allow scrolling if needed */
 }
 
-/* Main CRT Display */
+/* Main CRT Monitor */
 .monitor-frame {
     display: flex;
     flex-direction: column;
-    flex: 2;  /* Take 2 parts of 4 */
-    justify-content: space-between;  /* Push input to bottom */
+    flex: 2 1 50%;
+    justify-content: space-between;
     height: 100%;
     background: #111;
     border: 15px solid #333;
     border-radius: 12px;
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
     overflow: hidden;
+    max-width: 800px;  /* Prevent excessive stretching */
 }
 
+/* CRT Screen */
 .crt {
-    flex-grow: 1;  /* Make the console fill vertical space */
+    flex-grow: 1;  
     width: 100%;
     background: #000;
     border-radius: 6px;
@@ -132,7 +136,7 @@ body, html {
     transition: width 0.5s ease-in-out;
 }
 
-/* Wallet Section (RuneScape Inventory Style) */
+/* Wallet Section */
 .wallet-section {
     background: #333;
     padding: 20px;
@@ -172,11 +176,16 @@ body, html {
     background: #333;
     padding: 20px;
     border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+    flex: 1;
+    min-height: 200px;
 }
 
+/* Input and Button Flex */
 .post-input {
     display: flex;
     gap: 10px;
+    width: 100%;
 }
 
 .post-input input {
@@ -186,6 +195,7 @@ body, html {
     border: 1px solid #5f5;
     background: #000;
     color: #0f0;
+    border-radius: 5px;
 }
 
 .post-input button {
@@ -195,10 +205,13 @@ body, html {
     cursor: pointer;
     color: #000;
     font-weight: bold;
+    border-radius: 5px;
 }
 
 .posts {
     margin-top: 15px;
+    overflow-y: auto;
+    max-height: 300px; /* Prevent infinite growth */
 }
 
 .post {
@@ -210,6 +223,16 @@ body, html {
 }
 
 /* Task Tree */
+.task-tree {
+    flex: 1;
+    background: #333;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+    overflow-y: auto;
+    min-height: 200px;
+}
+
 .task-tree ul {
     list-style-type: none;
     padding-left: 20px;
@@ -231,17 +254,21 @@ body, html {
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+    flex: 1;
+    min-height: 250px;
 }
 
 .skills-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .skill-branch {
-    flex: 1;
+    flex: 1 1 45%;
     text-align: center;
-    margin: 0 15px;
+    margin: 10px;
+    min-width: 200px;
 }
 
 .skill-branch h3 {
@@ -261,6 +288,7 @@ body, html {
     border: 1px solid #444;
 }
 
+/* Unlock Button */
 .unlock-btn {
     margin-top: 10px;
     padding: 8px 12px;
@@ -269,6 +297,7 @@ body, html {
     border: none;
     cursor: pointer;
     font-weight: bold;
+    border-radius: 5px;
 }
 
 .unlock-btn:disabled {
@@ -276,16 +305,18 @@ body, html {
     cursor: not-allowed;
 }
 
-
 /* To-Do List Section */
-.todo-list, .activity-feed {
+.todo-list {
     background: #333;
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+    flex: 1;
+    min-height: 250px;
+    overflow-y: auto;
 }
 
-.todo-list h2, .activity-feed h2 {
+.todo-list h2 {
     margin-bottom: 15px;
 }
 
@@ -316,6 +347,9 @@ body, html {
     border-radius: 8px;
 }
 
+
+
+
 /* Glowing Effects */
 @keyframes monitorGlow {
     from {
@@ -340,11 +374,12 @@ body, html {
 
 
 
-/* Media Query for Smaller Screens */
+/* Responsive Sidebar and Monitor Layouts */
 @media (max-width: 1200px) {
     .desk-container {
         flex-direction: column;
         align-items: center;
+        overflow-y: auto;
     }
 
     .left-sidebar, .right-sidebar {
@@ -355,11 +390,21 @@ body, html {
     .monitor-frame {
         width: 100%;
     }
+
+    .skills-container {
+        flex-direction: column;
+    }
+
+    .skill-branch {
+        flex: none;
+        width: 100%;
+    }
 }
 
 @media (max-width: 768px) {
     .desk-container {
         flex-direction: column;
+        overflow-y: auto;
     }
 
     .left-sidebar, .right-sidebar {
@@ -370,5 +415,10 @@ body, html {
     .monitor-frame {
         order: 1;
         height: 60vh;
+    }
+
+    .skills-container {
+        flex-direction: column;
+        align-items: center;
     }
 }
