@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Greet user when the page loads
     window.onload = () => {
-        greetUser();
+       // greetUser();
         listenForActivity();
     };
 

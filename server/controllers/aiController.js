@@ -144,32 +144,16 @@ async function greetUser(req, res) {
         const assistantId = await aiServices.ensureAssistant();
         const threadId = await aiServices.getOrCreateThread(assistantId);
 
-        const messages = await aiServices.getThreadMessages(threadId) || [];
-        console.log('Thread messages:', messages);
+        // Run the thread if it was just created
+        const runResult = await aiServices.runThread(threadId, assistantId);
 
-        // Use regex to detect a greeting more flexibly
-        const greetingRegex = /assist|help|support/i;
-        const alreadyGreeted = Array.isArray(messages) &&
-                               messages.some(msg => greetingRegex.test(msg));
-
-        if (!alreadyGreeted) {
-            const greetingPrompt = "Greet the user and ask how you can help today.";
-            await aiServices.addMessageToThread(threadId, greetingPrompt);
-            await aiServices.runThread(threadId, assistantId);
-        } else {
-            console.log('Greeting already exists. Skipping...');
-        }
-
-        const latestMessage = Array.isArray(messages) && messages.length > 0
-            ? messages[messages.length - 1]
-            : "Hello! How can I assist you today?";
-
-        res.json({ status: 'success', result: latestMessage });
+        res.json({ status: 'success', result: 'Thread is active and ready.' });
     } catch (err) {
-        console.error('Error during greeting:', err.message);
-        res.status(500).json({ error: 'Failed to process greeting' });
+        console.error('Error during thread setup:', err.message);
+        res.status(500).json({ error: 'Failed to initialize thread.' });
     }
 }
+
 
 
 
