@@ -4,47 +4,56 @@ body, html {
     font-family: 'Courier New', monospace;
     background-color: #1e1e1e;
     color: #fff;
+    height: 100%;
+    overflow: hidden;
 }
 
+/* Main Desk Layout */
 .desk-container {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     height: 100vh;
-    gap: 20px;
+    gap: 50px;
+    padding: 20px;
 }
 
-/* CRT Monitor Frame */
+/* CRT Monitor Frame (Glowing) */
 .monitor-frame {
     background: #111;
-    border: 12px solid #333;
+    border: 15px solid #333;
     border-radius: 12px;
-    padding: 15px;
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    padding: 20px;
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
+    flex-shrink: 0;
+    width: 740px;
+    position: relative;
+    animation: monitorGlow 3s infinite alternate;
 }
 
 .crt {
-    width: 700px;
-    height: 400px;
+    width: 100%;
+    height: 450px;
     background: #000;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.6);
+    box-shadow: inset 0 0 30px rgba(0, 255, 0, 0.8);
 }
 
 .console {
-    height: 90%;
+    height: 85%;
     padding: 15px;
     overflow-y: auto;
-    font-size: 16px;
+    font-size: 18px;
     color: #0f0;
 }
 
+/* Command Bar */
 .command-input {
     display: flex;
     padding: 10px;
     background-color: #222;
-    border-top: 2px solid #0f0;
+    border-top: 3px solid #0f0;
 }
 
 .command-input input {
@@ -63,39 +72,52 @@ body, html {
     padding: 10px 15px;
     cursor: pointer;
     font-weight: bold;
+    transition: background 0.3s;
 }
 
-/* Side Panel (Agent + Tasks) */
+.command-input button:hover {
+    background: #5f5;
+}
+
+/* Side Panel */
 .side-panel {
-    width: 300px;
+    width: 350px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 30px;
 }
 
+/* Avatar Animation */
 .agent-avatar {
     text-align: center;
     background: #222;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    animation: avatarGlow 5s infinite alternate;
 }
 
 .agent-avatar img {
-    width: 100px;
+    width: 140px;
     border-radius: 50%;
 }
 
 .status {
     margin-top: 10px;
-    font-style: italic;
+    font-size: 18px;
     color: #0f0;
 }
 
-/* Task List */
+/* To-Do List Section */
 .todo-list, .activity-feed {
     background: #333;
-    padding: 20px;
-    border-radius: 8px;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.todo-list h2, .activity-feed h2 {
+    margin-bottom: 15px;
 }
 
 .todo-list ul {
@@ -105,14 +127,57 @@ body, html {
 
 .todo-list li {
     margin: 10px 0;
-    border-bottom: 1px solid #555;
-    padding: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+    background: #222;
+    border: 1px solid #555;
+    transition: background 0.3s ease-in;
+}
+
+.todo-list li:hover {
+    background: #3a3a3a;
 }
 
 /* Activity Log */
 #activityLogs {
-    height: 150px;
+    height: 200px;
     overflow-y: auto;
     background: #111;
-    padding: 10px;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+/* Glowing Effects */
+@keyframes monitorGlow {
+    from {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    }
+    to {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+    }
+}
+
+@keyframes avatarGlow {
+    from {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    }
+    to {
+        box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
+    }
+}
+
+/* Responsive Layout for Smaller Screens */
+@media (max-width: 1024px) {
+    .desk-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .side-panel {
+        width: 100%;
+    }
+
+    .monitor-frame {
+        width: 90%;
+    }
 }

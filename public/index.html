@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Agent Console</title>
+    <title>AI Agent - Digital Desk</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="desk-container">
+        
+        <!-- CRT Monitor Frame -->
         <div class="monitor-frame">
             <div class="crt">
                 <div class="console" id="console"></div>
@@ -18,26 +20,26 @@
             </div>
         </div>
 
+        <!-- Side Panel with Agent Avatar & Tasks -->
         <div class="side-panel">
-            <!-- Agent Avatar -->
             <div class="agent-avatar">
-                <img src="avatar.png" alt="Agent Avatar">
-                <div class="status">Awaiting Command...</div>
+                <img src="avatar.png" alt="Agent Avatar" class="avatar-img">
+                <div class="status" id="statusText">👋 Awaiting Command...</div>
             </div>
 
             <!-- To-Do List -->
             <div class="todo-list">
-                <h2>Task List</h2>
+                <h2>📋 Task List</h2>
                 <ul id="taskList">
-                    <li>No tasks yet...</li>
+                    <li class="fade-in">Initialize Agent...</li>
                 </ul>
             </div>
 
-            <!-- Activity Feed -->
+            <!-- Activity Log -->
             <div class="activity-feed">
-                <h2>Activity Logs</h2>
+                <h2>🛠️ Activity Logs</h2>
                 <div id="activityLogs">
-                    <p>System Initialization...</p>
+                    <p>Booting up the AI...</p>
                 </div>
             </div>
         </div>
