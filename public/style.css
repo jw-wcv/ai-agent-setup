@@ -334,3 +334,41 @@ body, html {
         box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
     }
 }
+
+
+
+
+
+
+/* Media Query for Smaller Screens */
+@media (max-width: 1200px) {
+    .desk-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .left-sidebar, .right-sidebar {
+        flex: none;
+        width: 100%;
+    }
+
+    .monitor-frame {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .desk-container {
+        flex-direction: column;
+    }
+
+    .left-sidebar, .right-sidebar {
+        width: 100%;
+        order: 2;
+    }
+
+    .monitor-frame {
+        order: 1;
+        height: 60vh;
+    }
+}
