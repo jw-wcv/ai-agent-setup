@@ -32,9 +32,6 @@ const whitelistPath = `${configPath}/ipwhitelist.txt`;
 let apiKey = fs.readFileSync(path.join(configPath, 'keys/api_key.txt'), 'utf8').trim();
 const openai = new OpenAI({ apiKey });
 
-// In-memory active thread
-let currentThreadId = null;
-
 // Helper to normalize IP addresses (IPv4-mapped IPv6)
 const formatIP = (ip) => (ip.includes('::ffff:') ? ip.split('::ffff:')[1] : ip);
 

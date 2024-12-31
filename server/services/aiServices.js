@@ -9,8 +9,11 @@ const AssistantModel = require('../database/models/Assistant'); // Mongoose Mode
 // Use CONFIG_DIR from .env or fallback to default
 const configPath = process.env.CONFIG_DIR || path.join(__dirname, '../../server/config');
 const keysPath = path.join(configPath, 'keys/api_key.txt');
+
 let activeThreadId = null;
+let currentThreadId = null;
 let apiKey;
+
 try {
     apiKey = fs.readFileSync(keysPath, 'utf8').trim();
     console.log('OpenAI API Key Loaded.');
