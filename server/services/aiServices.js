@@ -1,11 +1,13 @@
+require('dotenv').config();
 const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
 
-// Read API key from the config file
-const keysPath = path.join(__dirname, '../../config/keys/api_key.txt');
-let apiKey;
+// Use CONFIG_DIR from .env or fallback to default
+const configPath = process.env.CONFIG_DIR || path.join(__dirname, '../../config');
+const keysPath = path.join(configPath, 'keys/api_key.txt');
 
+let apiKey;
 try {
     apiKey = fs.readFileSync(keysPath, 'utf8').trim();
     console.log('OpenAI API Key Loaded.');

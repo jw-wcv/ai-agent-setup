@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017/ai-agent';
+const dbURI = process.env.MONGO_URI || 'mongodb://localhost:27017/agent';
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true });
 
 const db = mongoose.connection;

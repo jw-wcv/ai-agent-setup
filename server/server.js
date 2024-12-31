@@ -20,12 +20,13 @@ const app = express();
 app.use(express.json());
 
 // Paths
-const configPath = process.env.CONFIG_DIR || '/root/ai-agent-setup/server/config';
+const configPath = process.env.CONFIG_DIR || path.join(__dirname, 'config');
 const whitelistPath = `${configPath}/ipwhitelist.txt`;
 
 // OpenAI API Configuration
 let apiKey = fs.readFileSync(path.join(configPath, 'keys/api_key.txt'), 'utf8').trim();
 const openai = new OpenAI({ apiKey });
+
 
 // Helper to normalize IP addresses (IPv4-mapped IPv6)
 const formatIP = (ip) => (ip.includes('::ffff:') ? ip.split('::ffff:')[1] : ip);
