@@ -30,8 +30,8 @@ async function ensureAssistant() {
         if (!assistant) {
             const newAssistant = await createAssistant(
                 "AI Virtual Machine Agent",
-                "Manage virtual machines and execute commands as requested by the user.",
-                "AI assistant for managing VM tasks"
+                "You are an AI managing virtual machines. Respond to user input.",
+                "AI capable of managing VM tasks."
             );
             assistant = new AssistantModel({
                 assistantId: newAssistant.id,
@@ -40,7 +40,7 @@ async function ensureAssistant() {
                 description: newAssistant.description
             });
             await assistant.save();
-            console.log(`New Assistant Created and Stored: ${newAssistant.id}`);
+            console.log(`New Assistant Created: ${newAssistant.id}`);
         } else {
             console.log(`Using Existing Assistant: ${assistant.assistantId}`);
         }
@@ -50,6 +50,7 @@ async function ensureAssistant() {
         throw error;
     }
 }
+
 
 // Ensure Thread Exists
 async function ensureThread() {
@@ -162,23 +163,25 @@ async function getThreadMessages(threadId) {
 async function handleCommand(command) {
     const threadId = await ensureThread();
     await addMessageToThread(threadId, command);
+    
+    // Explicitly run the thread and wait for completion
     const runResponse = await runThread(threadId);
-
+    
     if (!runResponse || !runResponse.id) {
         throw new Error("Failed to run thread.");
     }
-
-    // Fetch thread messages after AI processes command
+    
+    // Fetch messages again after the assistant processes the command
     const messages = await getThreadMessages(threadId);
-    const latestMessage = messages[messages.length - 1];  // Get the last message
+    const latestMessage = messages[messages.length - 1];  // Get the latest AI response
 
-    // Log the entire latest message to debug the structure
+    // Log the latest AI response for debugging
     console.log("Latest AI Response Object:", JSON.stringify(latestMessage, null, 2));
 
     let responseText = '';
 
-    // Properly extract and format the AI response from nested object
-    if (latestMessage && latestMessage.content) {
+    // Extract the assistant's response from the message content
+    if (latestMessage && latestMessage.role === 'assistant' && latestMessage.content) {
         latestMessage.content.forEach(item => {
             if (item.type === 'text' && item.text && item.text.value) {
                 responseText += item.text.value + ' ';

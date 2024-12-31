@@ -1,3 +1,5 @@
+// app.js
+
 document.addEventListener("DOMContentLoaded", function () {
     const consoleDiv = document.getElementById('console');
     const commandInput = document.getElementById('command');
