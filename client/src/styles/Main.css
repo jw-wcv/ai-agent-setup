@@ -2,8 +2,7 @@
 
 .desk-container {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;  /* Sidebars take 1/3, monitor takes 2/3 */
-    grid-template-rows: auto;
+    grid-template-columns: minmax(250px, 1fr) minmax(600px, 2fr) minmax(250px, 1fr);  /* Flexible columns */
     height: 100vh;
     padding: 20px;
     gap: 20px;
