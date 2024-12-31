@@ -158,15 +158,13 @@ if [ -f "package.json" ]; then
         exit 1
     }
 
-    log_message "Dependencies installed. Starting server with PM2..."
     log_message "Ensuring PM2 process for AI Agent is running..."
-    pm2 describe ai-agent-server > /dev/null
-    if [ $? -eq 0 ]; then
-        log_message "AI Agent server already running. Restarting..."
-        pm2 restart ai-agent-server
-    else
+    if ! pm2 list | grep -q ai-agent-server; then
         log_message "Starting new PM2 process for AI Agent..."
         pm2 start /root/ai-agent-setup/server/server.js --name ai-agent-server
+    else
+        log_message "AI Agent server already running. Restarting..."
+        pm2 restart ai-agent-server
     fi
 
     pm2 startup
