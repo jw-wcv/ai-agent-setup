@@ -104,6 +104,10 @@ async function createAssistant(name, instructions, description) {
                 { type: "file_search" }  // Ensure it's compliant with OpenAI's API.
             ]
         });
+
+        // Reset thread upon new assistant creation
+        await AssistantModel.updateMany({}, { currentThreadId: null });
+        
         return response;
     } catch (error) {
         console.error('Error creating assistant:', error.message);
@@ -205,19 +209,34 @@ async function handleCommand(command) {
 }
 
 // Create or resume an AI conversation thread
-// Ensure thread exists or create one
 async function getOrCreateThread() {
-    if (!currentThreadId) {
+    const assistant = await AssistantModel.findOne({});
+    
+    if (assistant && assistant.currentThreadId) {
+        console.log(`Reusing existing thread: ${assistant.currentThreadId}`);
+        currentThreadId = assistant.currentThreadId;
+    } else {
+        // Create a new thread if none exists
         const thread = await createThread();
         if (thread && thread.id) {
             currentThreadId = thread.id;
             console.log(`New thread created: ${currentThreadId}`);
+
+            // Persist the thread to the database
+            if (assistant) {
+                assistant.currentThreadId = thread.id;
+                await assistant.save();
+            } else {
+                await AssistantModel.create({ currentThreadId: thread.id });
+            }
         } else {
             throw new Error("Failed to create thread.");
         }
     }
+
     return currentThreadId;
 }
+
 
 
 

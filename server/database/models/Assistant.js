@@ -9,6 +9,7 @@ const assistantSchema = new mongoose.Schema({
     name: String,
     instructions: String,
     description: String,
+    currentThreadId: String,
     createdAt: {
         type: Date,
         default: Date.now
