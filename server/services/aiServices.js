@@ -4,7 +4,9 @@ require('dotenv').config();
 const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
-const AssistantModel = require('../database/models/Assistant'); // Mongoose Model
+const AssistantModel = require('../database/models/Assistant'); 
+const AgentThread = require('../database/models/AgentThread');
+
 
 // Use CONFIG_DIR from .env or fallback to default
 const configPath = process.env.CONFIG_DIR || path.join(__dirname, '../../server/config');
@@ -209,32 +211,36 @@ async function handleCommand(command) {
 }
 
 // Create or resume an AI conversation thread
-async function getOrCreateThread() {
-    const assistant = await AssistantModel.findOne({});
-    
-    if (assistant && assistant.currentThreadId) {
-        console.log(`Reusing existing thread: ${assistant.currentThreadId}`);
-        currentThreadId = assistant.currentThreadId;
-    } else {
-        // Create a new thread if none exists
+async function getOrCreateThread(assistantId) {
+    try {
+        // 1. Check if a thread exists for the given assistant
+        let agentThread = await AgentThread.findOne({ assistantId });
+
+        // 2. If thread exists, return it
+        if (agentThread) {
+            console.log(`Reusing existing thread: ${agentThread.threadId}`);
+            return agentThread.threadId;
+        }
+
+        // 3. Otherwise, create a new thread
         const thread = await createThread();
         if (thread && thread.id) {
-            currentThreadId = thread.id;
-            console.log(`New thread created: ${currentThreadId}`);
+            const newThread = new AgentThread({
+                assistantId,
+                threadId: thread.id,
+                threadStatus: 'active'
+            });
 
-            // Persist the thread to the database
-            if (assistant) {
-                assistant.currentThreadId = thread.id;
-                await assistant.save();
-            } else {
-                await AssistantModel.create({ currentThreadId: thread.id });
-            }
+            await newThread.save();
+            console.log(`New thread created and saved: ${thread.id}`);
+            return thread.id;
         } else {
             throw new Error("Failed to create thread.");
         }
+    } catch (error) {
+        console.error("Error in getOrCreateThread:", error.message);
+        throw error;
     }
-
-    return currentThreadId;
 }
 
 

@@ -106,16 +106,18 @@ app.get('/vm-log-stream', (req, res) => {
 app.get('/greet', async (req, res) => {
     try {
         const assistantId = await ensureAssistant();
-        const threadId = await getOrCreateThread();
+
+        // Pass the assistant ID to getOrCreateThread
+        const threadId = await getOrCreateThread(assistantId);
+
         const greetingPrompt = "Greet the user and ask how you can help today.";
 
-        const response = await addMessageToThread(threadId, greetingPrompt);
+        await addMessageToThread(threadId, greetingPrompt);
         await runThread(threadId);
 
         const messages = await getThreadMessages(threadId);
         const latestMessage = messages[messages.length - 1]?.content || "Hello! How can I assist you today?";
 
-        console.log(`AI Greeting Response: ${latestMessage}`);
         res.json({ status: 'success', result: latestMessage });
     } catch (err) {
         console.error('Error during greeting:', err.message);
