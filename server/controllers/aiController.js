@@ -157,7 +157,36 @@ async function greetUser(req, res) {
     }
 }
 
+
+async function handleCommand(req, res) {
+    const { command } = req.body;
+
+    if (!command) {
+        return res.status(400).json({ error: 'No command provided' });
+    }
+
+    try {
+        const assistantId = await aiServices.ensureAssistant();
+        const threadId = await aiServices.getOrCreateThread(assistantId);
+
+        // Add the user command to the thread
+        await aiServices.addMessageToThread(threadId, command);
+        const runResult = await aiServices.runThread(threadId);
+        
+        // Get the latest messages from the thread
+        const messages = await aiServices.getThreadMessages(threadId);
+        const latestMessage = messages[messages.length - 1]?.content || 'Command executed successfully.';
+
+        res.json({ status: 'success', result: latestMessage });
+    } catch (error) {
+        console.error('Error processing command:', error);
+        res.status(500).json({ error: 'Failed to process command' });
+    }
+}
+
+
 module.exports = {
+    handleCommand,
     createAgent,
     listAssistants,
     deleteSpecificAgent,
