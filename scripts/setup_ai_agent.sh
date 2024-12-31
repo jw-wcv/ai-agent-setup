@@ -33,18 +33,17 @@ sudo apt install -y curl gnupg apt-transport-https python3 python3-pip build-ess
 log_message "Checking and installing MongoDB 4.4..."
 if ! command -v mongod &> /dev/null
 then
-    log_message "Installing MongoDB 4.4..."
+    log_message "Installing MongoDB 4.4 from focal repository..."
     curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-4.4.gpg
-    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-4.4.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-4.4.gpg ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
     sudo apt update
-    sudo apt install -y mongodb-org=4.4.18 mongodb-org-server=4.4.18 mongodb-org-shell=4.4.18 mongodb-org-mongos=4.4.18 mongodb-org-tools=4.4.18
+    sudo apt install -y mongodb-org
+    log_message "Starting and enabling MongoDB service..."
+    sudo systemctl start mongod
+    sudo systemctl enable mongod
 else
     log_message "MongoDB is already installed."
 fi
-
-log_message "Starting and enabling MongoDB service..."
-sudo systemctl start mongod
-sudo systemctl enable mongod
 
 # Retry starting MongoDB if it fails
 if ! systemctl is-active --quiet mongod
