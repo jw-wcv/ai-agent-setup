@@ -90,13 +90,6 @@ body, html {
     background: #5f5;
 }
 
-/* Side Panel */
-.side-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
 /* Avatar Section */
 .agent-avatar {
     text-align: center;
