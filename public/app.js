@@ -1,88 +1,100 @@
-// app.js
-
 document.addEventListener("DOMContentLoaded", function () {
     const consoleDiv = document.getElementById('console');
+    const activityFeed = document.getElementById('activity-feed');
     const commandInput = document.getElementById('command');
     const sendBtn = document.getElementById('sendBtn');
 
-    // Greet the user immediately when the page loads
-    window.onload = async function() {
+    // On load - greet user and start listening for activity
+    window.onload = () => {
+        greetUser();
+        listenForActivity();
+    };
+
+    // Greet user or resume context
+    async function greetUser() {
         try {
-            const response = await fetch('/api/ai/greet');  // Updated to match route changes
+            const response = await fetch('/api/ai/greet');
             const data = await response.json();
             
             if (data.status === 'success') {
-                const aiResponse = data.result;
-                displayAIResponse(aiResponse);
+                displayAIResponse(data.result);
             } else {
-                consoleDiv.innerHTML += `<div>Error retrieving greeting: ${data.error}</div>`;
+                displayError("Failed to greet the user.");
             }
         } catch (err) {
-            consoleDiv.innerHTML += `<div>Error contacting AI agent.</div>`;
+            displayError("Connection issue during greeting.");
         }
-    };
+    }
 
-    // Send user command to server
+    // Send user command to agent
     async function sendCommand() {
-        const command = commandInput.value;
-        if (command) {
-            try {
-                const response = await fetch('/api/ai/command', {  // Updated API path
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ command })
-                });
-    
-                if (!response.ok) {
-                    throw new Error(`Server error: ${response.status}`);
-                }
-    
-                const data = await response.json();
-                
-                consoleDiv.innerHTML += `<div>User: ${command}</div>`;
-                
-                if (data.status === 'success') {
-                    const aiResponse = data.result;
-                    displayAIResponse(aiResponse);
-                } else {
-                    consoleDiv.innerHTML += `<div>Error: ${data.error}</div>`;
-                }
-            } catch (err) {
-                consoleDiv.innerHTML += `<div>Error contacting AI agent: ${err.message}</div>`;
-            }
-    
-            commandInput.value = '';
-            consoleDiv.scrollTop = consoleDiv.scrollHeight;
-        }
-    }
-    
-    // Helper function to display AI responses
-    function displayAIResponse(aiResponse) {
-        if (Array.isArray(aiResponse)) {
-            aiResponse.forEach(item => {
-                if (item && typeof item === 'object') {
-                    // Pretty print JSON if the response is an object
-                    consoleDiv.innerHTML += `<div>AI: ${JSON.stringify(item, null, 2)}</div>`;
-                } else {
-                    consoleDiv.innerHTML += `<div>AI: ${item}</div>`;
-                }
+        const command = commandInput.value.trim();
+        if (!command) return;
+
+        // Display user input immediately
+        consoleDiv.innerHTML += `<div>User: ${command}</div>`;
+        commandInput.value = '';
+
+        try {
+            const response = await fetch('/api/ai/command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ command })
             });
-        } else if (typeof aiResponse === 'object') {
-            // Handle object response
-            for (const [key, value] of Object.entries(aiResponse)) {
-                consoleDiv.innerHTML += `<div>AI: ${key}: ${value}</div>`;
+
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                displayAIResponse(data.result);
+            } else {
+                displayError("Failed to process command.");
             }
-        } else {
-            // Simple string response
-            consoleDiv.innerHTML += `<div>AI: ${aiResponse}</div>`;
+        } catch (err) {
+            displayError("Failed to communicate with agent.");
         }
+
+        scrollToBottom();
     }
 
-    // Event listeners for button click and enter key
+    // WebSocket or Polling for Activity Feed
+    function listenForActivity() {
+        const eventSource = new EventSource('/vm-log-stream');
+        
+        eventSource.onmessage = (event) => {
+            displayActivity(event.data);
+        };
+
+        eventSource.onerror = (error) => {
+            displayActivity('⚠️ Connection lost. Reconnecting...');
+        };
+    }
+
+    // Display AI response in the chat
+    function displayAIResponse(aiResponse) {
+        consoleDiv.innerHTML += `<div class="ai-response">AI: ${aiResponse}</div>`;
+        scrollToBottom();
+    }
+
+    // Display activity logs or task updates
+    function displayActivity(log) {
+        activityFeed.innerHTML += `<div>${log}</div>`;
+        activityFeed.scrollTop = activityFeed.scrollHeight;
+    }
+
+    // Display error messages
+    function displayError(message) {
+        consoleDiv.innerHTML += `<div class="error">Error: ${message}</div>`;
+        scrollToBottom();
+    }
+
+    // Auto-scroll to the latest message
+    function scrollToBottom() {
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
+    }
+
+    // Event listeners for sending messages
     sendBtn.addEventListener("click", sendCommand);
     commandInput.addEventListener("keypress", function (e) {
-        if (e.key === 'Enter') {
-            sendCommand();
-        }
+        if (e.key === 'Enter') sendCommand();
     });
 });

@@ -8,16 +8,26 @@
 </head>
 <body>
     <div class="container">
-        <h1>AI Agent - Virtual Machine Console</h1>
-        <div class="console-wrapper">
-            <div id="console" class="console"></div>
-        </div>
-        <div class="command-input">
-            <input type="text" id="command" placeholder="Type command..." autofocus>
-            <button id="sendBtn">Send</button>
+        <h1>AI Agent Console</h1>
+        
+        <div class="main-panel">
+            <!-- Left: Chat Console -->
+            <div class="left-panel">
+                <div id="console" class="console"></div>
+                <div class="command-input">
+                    <input type="text" id="command" placeholder="Type your message..." autofocus>
+                    <button id="sendBtn">Send</button>
+                </div>
+            </div>
+            
+            <!-- Right: Activity Monitor -->
+            <div class="right-panel">
+                <h2>Activity Monitor</h2>
+                <div id="activity-feed" class="activity-feed"></div>
+            </div>
         </div>
     </div>
 
-    <script src="app.js"></script> <!-- Link to the external JavaScript file -->
+    <script src="app.js"></script>
 </body>
 </html>
