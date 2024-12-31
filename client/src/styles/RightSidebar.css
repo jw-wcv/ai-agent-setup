@@ -41,7 +41,3 @@
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
 }
 
-.task-tree {
-    max-height: 50vh;
-    overflow-y: auto;
-}

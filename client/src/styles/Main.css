@@ -1,65 +1,73 @@
 /* Main.css */
 
-
 .desk-container {
     display: flex;
     flex-direction: row;
-    height: 100vh;
+    height: 100vh;  /* Full viewport height */
     padding: 20px;
     gap: 20px;
-    overflow: hidden;
+    overflow: hidden;  /* Prevent full page scroll */
 }
 
 .left-sidebar, .right-sidebar {
-    flex: 1 1 20%;
+    flex: 1 1 20%;  /* Sidebar takes 20% but can grow/shrink */
     max-width: 350px;
-    min-width: 300px;
-    overflow-y: auto;
-    height: calc(100vh - 40px);  /* Fit within viewport */
+    min-width: 280px;
+    overflow-y: auto;  /* Scroll if content overflows */
 }
 
 .monitor-frame {
+    flex: 2 1 60%;  /* Monitor grows with available space */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    height: calc(100vh - 40px);
     background: #111;
     border: 15px solid #333;
     border-radius: 12px;
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
-    flex: 2 1 60%;
-    max-width: 1000px;
-    min-width: 600px;
-    min-height: 500px;
     overflow: hidden;
 }
 
-/* Responsive Layout */
+/* Scrollbar Customization */
+.skill-tree::-webkit-scrollbar,
+.task-tree::-webkit-scrollbar {
+  width: 10px;
+}
+
+.skill-tree::-webkit-scrollbar-thumb,
+.task-tree::-webkit-scrollbar-thumb {
+  background-color: #0f0;
+  border-radius: 10px;
+}
+
+/* Scrolls within sections */
+.task-tree, .skill-tree {
+    max-height: 100%;  /* Max height without overflow */
+    overflow-y: auto;
+}
+
+
+/* Responsive Design */
 @media (max-width: 1200px) {
     .desk-container {
         flex-direction: column;
-        align-items: center;
-        overflow-y: auto;
-        height: auto;
     }
   
     .left-sidebar, .right-sidebar {
         flex: none;
         width: 100%;
-        height: auto;
+        max-height: 400px;  /* Limit height for sidebars */
     }
   
     .monitor-frame {
         width: 100%;
-        min-height: 500px;
+        flex-grow: 1;
     }
 }
-
+  
 @media (max-width: 768px) {
     .desk-container {
         flex-direction: column;
-        overflow-y: auto;
-        height: auto;
     }
   
     .left-sidebar, .right-sidebar {
@@ -69,6 +77,7 @@
   
     .monitor-frame {
         order: 1;
-        height: 60vh;
+        height: auto;
+        min-height: 400px;
     }
 }
