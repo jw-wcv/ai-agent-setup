@@ -1,19 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/RightSidebar.css';
 
-
 function RightSidebar() {
+    const [xp, setXp] = useState(1200);
+    const [skillPoints, setSkillPoints] = useState(5);
+    const [health, setHealth] = useState(100);
+    const [walletItems] = useState(['🪙', '💎', '🔮', '⚙️', '📜', '🔑']);
+
+    useEffect(() => {
+        // Simulate health decay and XP growth
+        const interval = setInterval(() => {
+            setHealth((prev) => Math.max(prev - 10, 0));
+            setXp((prev) => prev + 50);
+        }, 10000);
+
+        const skillInterval = setInterval(() => {
+            setSkillPoints((prev) => prev + 1);
+        }, 20000);
+
+        return () => {
+            clearInterval(interval);
+            clearInterval(skillInterval);
+        };
+    }, []);
+
     return (
         <div className="right-sidebar">
             <div className="wallet-section">
                 <h2>💰 Wallet Balance</h2>
                 <div className="wallet-grid">
-                    <div className="wallet-item">🪙</div>
-                    <div className="wallet-item">💎</div>
-                    <div className="wallet-item">🔮</div>
-                    <div className="wallet-item">⚙️</div>
-                    <div className="wallet-item">📜</div>
-                    <div className="wallet-item">🔑</div>
+                    {walletItems.map((item, index) => (
+                        <div key={index} className="wallet-item">{item}</div>
+                    ))}
                 </div>
             </div>
 
@@ -22,7 +40,7 @@ function RightSidebar() {
                 <div className="stat">⚡ Compute: 75%</div>
                 <div className="stat">🧠 Intelligence: 60%</div>
                 <div className="stat">🔗 Collaboration: 50%</div>
-                <div className="stat">📈 XP: 1200</div>
+                <div className="stat">📈 XP: {xp}</div>
             </div>
 
             <div className="task-tree">
@@ -44,23 +62,7 @@ function RightSidebar() {
 
             <div className="skill-tree">
                 <h2>🌟 Skill Tree</h2>
-                <div className="skills-container">
-                    <div className="skill-branch">
-                        <h3>⚡ Compute Efficiency</h3>
-                        <ul>
-                            <li>🔓 Base Compute <button>Unlock</button></li>
-                            <li>🔒 Advanced Compute <button disabled>Locked</button></li>
-                        </ul>
-                    </div>
-                    <div className="skill-branch">
-                        <h3>💰 Trading Mastery</h3>
-                        <ul>
-                            <li>🔓 Trade Basics <button>Unlock</button></li>
-                            <li>🔒 Arbitrage Strategy <button disabled>Locked</button></li>
-                        </ul>
-                    </div>
-                </div>
-                <p>🎯 Skill Points: <span>5</span></p>
+                <p>🎯 Skill Points: {skillPoints}</p>
             </div>
         </div>
     );
