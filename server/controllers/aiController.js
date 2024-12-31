@@ -175,13 +175,17 @@ async function handleCommand(req, res) {
         await aiServices.addMessageToThread(threadId, command);
         
         // Run the thread and wait for the response
-        const runResult = await aiServices.runThread(threadId, assistantId);
+        await aiServices.runThread(threadId, assistantId);
         
         // Get the latest messages from the thread
-        const messages = await aiServices.getThreadMessages(threadId) || [];
+        let messages = await aiServices.getThreadMessages(threadId) || [];
         console.log('Thread messages:', messages);
 
-        // Ensure messages is an array before filtering
+        // Ensure messages is an array (Extract if it's wrapped in an object)
+        if (messages && messages.messages) {
+            messages = messages.messages;  // Extract if returned in { messages: [...] } format
+        }
+        
         const filteredMessages = Array.isArray(messages)
             ? messages.filter(msg => !msg.includes("assist you today"))
             : [];
@@ -196,6 +200,7 @@ async function handleCommand(req, res) {
         res.status(500).json({ error: 'Failed to process command' });
     }
 }
+
 
 
 
