@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
             
             if (data.status === 'success') {
-                displayAIResponse(data.result);
+                displayAIResponse(data.result);  // Ensure AI output shows up here
                 addTask(command);
             } else {
                 displayError("Failed to process command.");
@@ -55,6 +55,13 @@ document.addEventListener("DOMContentLoaded", function () {
         } catch (err) {
             displayError("Failed to communicate with agent.");
         }
+    }
+
+    // Update CRT with AI response
+    function displayAIResponse(response) {
+        consoleDiv.innerHTML += `<div class="ai-response">AI: ${response}</div>`;
+        agentStatus.innerHTML = "Awaiting Command...";
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;  // Auto-scroll to latest response
     }
 
     // Log task into the to-do list
@@ -75,11 +82,6 @@ document.addEventListener("DOMContentLoaded", function () {
         eventSource.onerror = () => {
             logActivity('⚠️ Connection lost. Reconnecting...');
         };
-    }
-
-    function displayAIResponse(response) {
-        consoleDiv.innerHTML += `<div class="ai-response">AI: ${response}</div>`;
-        agentStatus.innerHTML = "Awaiting Command...";
     }
 
     function displayError(message) {
