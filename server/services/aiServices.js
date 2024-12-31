@@ -136,7 +136,7 @@ async function waitForRunCompletion(threadId, runId) {
 
 // Retrieve thread messages
 async function getThreadMessages(threadId) {
-    const response = await openaiClient.beta.threads.messages.list(threadId);
+    const response = await openaiClient.beta.threads.messages.list(threadId, { limit: 10 });
     const messages = response.data.map((message) => {
         return message.content.map(content => content.text?.value).join('\n');
     }).join('\n\n');
@@ -144,7 +144,6 @@ async function getThreadMessages(threadId) {
     console.log("Thread Messages:\n", messages);
     return messages || 'No messages found.';
 }
-
 
 async function processCommand(command) {
     if (!command) {
@@ -165,6 +164,9 @@ async function processCommand(command) {
     return latestMessage;
 }
 
+async function clearThread(threadId) {
+    await openaiClient.beta.threads.archive(threadId);
+}
 
 module.exports = {
     processCommand,
@@ -173,5 +175,6 @@ module.exports = {
     createThread,
     addMessageToThread,
     runThread,
-    getThreadMessages
+    getThreadMessages,
+    clearThread
 };

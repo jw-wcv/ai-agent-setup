@@ -144,13 +144,16 @@ async function greetUser(req, res) {
         const assistantId = await aiServices.ensureAssistant();
         const threadId = await aiServices.getOrCreateThread(assistantId);
 
-        const greetingPrompt = "Greet the user and ask how you can help today.";
-        await aiServices.addMessageToThread(threadId, greetingPrompt);
-        await aiServices.runThread(threadId, assistantId);
-
         const messages = await aiServices.getThreadMessages(threadId);
-        const latestMessage = messages[messages.length - 1]?.content || "Hello! How can I assist you today?";
+        const alreadyGreeted = messages.some(msg => msg.includes("assist you today"));
 
+        if (!alreadyGreeted) {
+            const greetingPrompt = "Greet the user and ask how you can help today.";
+            await aiServices.addMessageToThread(threadId, greetingPrompt);
+            await aiServices.runThread(threadId);
+        }
+
+        const latestMessage = messages[messages.length - 1]?.content || "Hello! How can I assist you today?";
         res.json({ status: 'success', result: latestMessage });
     } catch (err) {
         console.error('Error during greeting:', err.message);
@@ -159,15 +162,17 @@ async function greetUser(req, res) {
 }
 
 
+
 async function handleCommand(req, res) {
     const { command } = req.body;
 
     try {
         const result = await aiServices.processCommand(command);
+        await aiServices.clearThread(result.threadId);  // Clear thread after running
         res.json({ status: 'success', result });
     } catch (error) {
         console.error('Error processing command:', error);
-        res.status(500).json({ error: error.message || 'Failed to process command' });
+        res.status(500).json({ error: 'Failed to process command' });
     }
 }
 
