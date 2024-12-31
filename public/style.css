@@ -1,3 +1,4 @@
+/* General Reset */
 body, html {
     margin: 0;
     padding: 0;
@@ -8,32 +9,31 @@ body, html {
     overflow: hidden;
 }
 
-/* Main Desk Layout */
+/* Main Layout */
 .desk-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    grid-template-rows: auto 1fr;
     height: 100vh;
-    gap: 50px;
+    gap: 20px;
     padding: 20px;
 }
 
-/* CRT Monitor Frame (Glowing) */
+/* CRT Monitor Frame */
 .monitor-frame {
+    grid-column: 2 / span 1;
     background: #111;
     border: 15px solid #333;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
-    flex-shrink: 0;
-    width: 740px;
     position: relative;
     animation: monitorGlow 3s infinite alternate;
 }
 
 .crt {
     width: 100%;
-    height: 450px;
+    height: 400px;
     background: #000;
     border-radius: 6px;
     overflow: hidden;
@@ -81,13 +81,12 @@ body, html {
 
 /* Side Panel */
 .side-panel {
-    width: 350px;
     display: flex;
     flex-direction: column;
     gap: 30px;
 }
 
-/* Avatar Animation */
+/* Avatar Section */
 .agent-avatar {
     text-align: center;
     background: #222;
@@ -108,82 +107,26 @@ body, html {
     color: #0f0;
 }
 
-/* To-Do List Section */
-.todo-list, .activity-feed {
-    background: #333;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-}
-
-.todo-list h2, .activity-feed h2 {
-    margin-bottom: 15px;
-}
-
-.todo-list ul {
-    list-style: none;
-    padding: 0;
-}
-
-.todo-list li {
-    margin: 10px 0;
-    padding: 10px;
+/* Health Bar */
+.health-bar {
+    width: 100%;
+    height: 20px;
+    background: #300;
+    border: 1px solid #900;
+    margin-top: 15px;
     border-radius: 5px;
-    background: #222;
-    border: 1px solid #555;
-    transition: background 0.3s ease-in;
+    overflow: hidden;
+    box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.5);
 }
 
-.todo-list li:hover {
-    background: #3a3a3a;
+.health-fill {
+    height: 100%;
+    width: 100%;
+    background: #0f0;
+    transition: width 0.5s ease-in-out;
 }
 
-/* Activity Log */
-#activityLogs {
-    height: 200px;
-    overflow-y: auto;
-    background: #111;
-    padding: 15px;
-    border-radius: 8px;
-}
-
-/* Glowing Effects */
-@keyframes monitorGlow {
-    from {
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-    }
-    to {
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
-    }
-}
-
-@keyframes avatarGlow {
-    from {
-        box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-    }
-    to {
-        box-shadow: 0 0 30px rgba(0, 255, 0, 0.7);
-    }
-}
-
-/* Responsive Layout for Smaller Screens */
-@media (max-width: 1024px) {
-    .desk-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .side-panel {
-        width: 100%;
-    }
-
-    .monitor-frame {
-        width: 90%;
-    }
-}
-
-
-/* Wallet Section (RuneScape Style) */
+/* Wallet Section (RuneScape Inventory Style) */
 .wallet-section {
     background: #333;
     padding: 20px;
@@ -215,25 +158,6 @@ body, html {
 
 .wallet-item:hover {
     background: #0a0;
-}
-
-/* Health Bar */
-.health-bar {
-    width: 100%;
-    height: 20px;
-    background: #300;
-    border: 1px solid #900;
-    margin-top: 15px;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.5);
-}
-
-.health-fill {
-    height: 100%;
-    width: 100%;
-    background: #0f0;
-    transition: width 0.5s ease-in-out;
 }
 
 /* Trending Board */
@@ -279,18 +203,7 @@ body, html {
     border: 1px solid #555;
 }
 
-.agent-stats, .task-tree {
-    background: #333;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.stat {
-    margin: 10px 0;
-}
-
+/* Task Tree */
 .task-tree ul {
     list-style-type: none;
     padding-left: 20px;
@@ -306,12 +219,12 @@ body, html {
     border-left: 1px solid #0f0;
 }
 
+/* Skill Tree Section */
 .skill-tree {
     background: #333;
     padding: 25px;
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-    margin-bottom: 20px;
 }
 
 .skills-container {

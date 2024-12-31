@@ -15,12 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const xpStat = document.getElementById('xpStat');
     const taskTree = document.getElementById('taskTree');
 
-    // Greet user when the page loads
-    window.onload = () => {
-       // greetUser();
-        listenForActivity();
-    };
-
     const skillPointsSpan = document.getElementById('skillPoints');
     const unlockButtons = document.querySelectorAll('.unlock-btn');
     let skillPoints = parseInt(skillPointsSpan.textContent);
@@ -56,24 +50,23 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-     // Simulate Wallet Items
-     const walletItems = ['🪙', '💎', '🔮', '⚙️', '📜', '🔑'];
-     walletItems.forEach(item => {
-         const div = document.createElement('div');
-         div.classList.add('wallet-item');
-         div.innerHTML = item;
-         walletGrid.appendChild(div);
-     });
+    // Simulate Wallet Items
+    const walletItems = ['🪙', '💎', '🔮', '⚙️', '📜', '🔑'];
+    walletItems.forEach(item => {
+        const div = document.createElement('div');
+        div.classList.add('wallet-item');
+        div.innerHTML = item;
+        walletGrid.appendChild(div);
+    });
 
-     // Health Bar (Simulate agent health drop)
+    // Health Bar Simulation
     let health = 100;
     function reduceHealth(amount) {
         health -= amount;
         if (health < 0) health = 0;
         healthFill.style.width = health + '%';
     }
-    
-    // Periodically drop health for fun
+
     setInterval(() => {
         reduceHealth(10);
         let xp = parseInt(xpStat.textContent);
@@ -92,20 +85,18 @@ document.addEventListener("DOMContentLoaded", function () {
         skillPointsSpan.textContent = skillPoints;
     }, 20000);  // Gain skill point every 20 seconds
 
-     // Dynamically Add Tasks to Tree
-     function addTaskToTree(taskName, parentTask) {
+    // Dynamically Add Tasks to Tree
+    function addTaskToTree(taskName, parentTask) {
         const newTask = document.createElement('li');
         newTask.innerHTML = `🔄 ${taskName}`;
         parentTask.appendChild(newTask);
     }
 
-    // Example: Adding Subtask After Command
-    document.getElementById('sendBtn').addEventListener('click', () => {
-        addTaskToTree('Compute Allocation', taskTree.children[0].children[0]);  // Append to Main Agent
+    sendBtn.addEventListener('click', () => {
+        addTaskToTree('Compute Allocation', taskTree.children[0].children[0]);  
     });
- 
 
-    // Send command to AI agent
+    // Send Command to AI
     async function sendCommand() {
         const command = commandInput.value.trim();
         if (!command) return;
@@ -124,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const data = await response.json();
             
             if (data.status === 'success') {
-                displayAIResponse(data.result);  // Ensure AI output shows up here
+                displayAIResponse(data.result);
                 addTask(command);
             } else {
                 displayError("Failed to process command.");
@@ -134,14 +125,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    // Update CRT with AI response
     function displayAIResponse(response) {
         consoleDiv.innerHTML += `<div class="ai-response">AI: ${response}</div>`;
         agentStatus.innerHTML = "Awaiting Command...";
-        consoleDiv.scrollTop = consoleDiv.scrollHeight;  // Auto-scroll to latest response
+        consoleDiv.scrollTop = consoleDiv.scrollHeight;
     }
 
-    // Log task into the to-do list
     function addTask(task) {
         const newTask = document.createElement('li');
         newTask.textContent = task;
@@ -173,18 +162,5 @@ document.addEventListener("DOMContentLoaded", function () {
     sendBtn.addEventListener("click", sendCommand);
     commandInput.addEventListener("keypress", (e) => {
         if (e.key === 'Enter') sendCommand();
-    });
-
-    // Post to Trending Board
-    document.getElementById('postBtn').addEventListener('click', () => {
-        const postInput = document.getElementById('postInput');
-        const post = postInput.value.trim();
-        if (post) {
-            const div = document.createElement('div');
-            div.classList.add('post');
-            div.textContent = post;
-            postsFeed.appendChild(div);
-            postInput.value = '';
-        }
     });
 });

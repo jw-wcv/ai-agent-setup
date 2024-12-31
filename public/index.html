@@ -20,21 +20,21 @@
             </div>
         </div>
 
-        <!-- Side Panel with Agent Avatar & Tasks -->
+        <!-- Wallet Section (RuneScape Style Grid) -->
+        <div class="wallet-section">
+            <h2>💰 Wallet Balance</h2>
+            <div class="wallet-grid" id="walletGrid">
+                <!-- Inventory Items will be inserted here -->
+            </div>
+        </div>
+
+        <!-- Side Panel with Agent Avatar & Stats -->
         <div class="side-panel">
             <div class="agent-avatar">
                 <img src="avatar.png" alt="Agent Avatar" class="avatar-img">
                 <div class="status" id="statusText">👋 Awaiting Command...</div>
                 <div class="health-bar">
                     <div class="health-fill" id="healthFill"></div>
-                </div>
-            </div>
-
-            <!-- Wallet Section (RuneScape Style Grid) -->
-            <div class="wallet-section">
-                <h2>💰 Wallet Balance</h2>
-                <div class="wallet-grid" id="walletGrid">
-                    <!-- Inventory Items will be inserted here -->
                 </div>
             </div>
 
@@ -56,23 +56,6 @@
                 <div class="posts" id="postsFeed"></div>
             </div>
 
-            <!-- Activity Log -->
-            <div class="activity-feed">
-                <h2>🛠️ Activity Logs</h2>
-                <div id="activityLogs">
-                    <p>Booting up the AI...</p>
-                </div>
-            </div>
-
-            <!-- Agent Stats Panel -->
-            <div class="agent-stats">
-                <h2>📊 Agent Stats</h2>
-                <div class="stat">⚡ Compute: <span id="computeStat">75</span>%</div>
-                <div class="stat">🧠 Intelligence: <span id="intelStat">60</span>%</div>
-                <div class="stat">🔗 Collaboration: <span id="collabStat">50</span>%</div>
-                <div class="stat">📈 XP: <span id="xpStat">1200</span></div>
-            </div>
-
             <!-- Tree View for Tasks -->
             <div class="task-tree">
                 <h2>🌳 Task Tree</h2>
@@ -91,6 +74,15 @@
                 </ul>
             </div>
 
+            <!-- Agent Stats Panel -->
+            <div class="agent-stats">
+                <h2>📊 Agent Stats</h2>
+                <div class="stat">⚡ Compute: <span id="computeStat">75</span>%</div>
+                <div class="stat">🧠 Intelligence: <span id="intelStat">60</span>%</div>
+                <div class="stat">🔗 Collaboration: <span id="collabStat">50</span>%</div>
+                <div class="stat">📈 XP: <span id="xpStat">1200</span></div>
+            </div>
+
             <!-- Skill Tree Section -->
             <div class="skill-tree">
                 <h2>🌟 Skill Tree</h2>
@@ -100,7 +92,6 @@
                         <ul>
                             <li>🔓 Base Compute <button class="unlock-btn" data-skill="compute1">Unlock</button></li>
                             <li>🔒 Advanced Compute <button class="unlock-btn" data-skill="compute2" disabled>Locked</button></li>
-                            <li>🔒 Quantum Compute <button class="unlock-btn" data-skill="compute3" disabled>Locked</button></li>
                         </ul>
                     </div>
                     <div class="skill-branch">
@@ -108,22 +99,11 @@
                         <ul>
                             <li>🔓 Trade Basics <button class="unlock-btn" data-skill="trade1">Unlock</button></li>
                             <li>🔒 Arbitrage Strategy <button class="unlock-btn" data-skill="trade2" disabled>Locked</button></li>
-                            <li>🔒 Blockchain Domination <button class="unlock-btn" data-skill="trade3" disabled>Locked</button></li>
-                        </ul>
-                    </div>
-                    <div class="skill-branch">
-                        <h3>🤝 Collaboration</h3>
-                        <ul>
-                            <li>🔓 Teamwork Protocol <button class="unlock-btn" data-skill="collab1">Unlock</button></li>
-                            <li>🔒 Alliance Formation <button class="unlock-btn" data-skill="collab2" disabled>Locked</button></li>
-                            <li>🔒 Decentralized Union <button class="unlock-btn" data-skill="collab3" disabled>Locked</button></li>
                         </ul>
                     </div>
                 </div>
                 <p>🎯 Skill Points: <span id="skillPoints">5</span></p>
             </div>
-
-
         </div>
     </div>
 
