@@ -16,7 +16,8 @@ const {
     addMessageToThread, 
     runThread, 
     getThreadMessages,
-    ensureAssistant 
+    ensureAssistant,
+    handleCommand 
 } = require('./services/aiServices');
 
 const app = express();
