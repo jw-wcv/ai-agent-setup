@@ -158,7 +158,6 @@ async function greetUser(req, res) {
 
 
 
-
 async function handleCommand(req, res) {
     const { command } = req.body;
 
@@ -193,26 +192,14 @@ async function handleCommand(req, res) {
             console.log('🔍 Detected object response for messages. Extracting...');
             messages = messages.messages || messages.data || [];
         }
-
         messages = Array.isArray(messages) ? messages : [];
 
-        // Keep most recent unique responses, filter only exact duplicates
-        const filteredMessages = messages.reduce((acc, msg) => {
-            if (
-                typeof msg === 'string' &&
-                !acc.includes(msg)  // Avoid exact duplicates
-            ) {
-                acc.push(msg);
-            }
-            return acc;
-        }, []);
-
-        // Prioritize AI-generated responses that are not generic greetings
-        const latestMessage = filteredMessages.reverse().find(msg => 
-            !msg.includes("assist you today") && !msg.includes("How can I")
-        ) || 'Command executed successfully.';
+        // Always return the most recent assistant response
+        const latestMessage = messages.length > 0
+            ? messages[messages.length - 1]  // Get the most relevant output
+            : 'Command executed successfully.';
         
-        console.log(`📜 Final message list (count: ${filteredMessages.length}):`, filteredMessages);
+        console.log(`📜 Final message list (count: ${messages.length}):`, messages);
         console.log(`📤 Returning response: "${latestMessage}"`);
         res.json({ status: 'success', result: latestMessage });
 
@@ -221,6 +208,7 @@ async function handleCommand(req, res) {
         res.status(500).json({ error: 'Failed to process command' });
     }
 }
+
 
 
 
