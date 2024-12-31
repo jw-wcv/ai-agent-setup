@@ -201,7 +201,20 @@ async function handleCommand(command) {
     return responseText.trim() || "AI did not return a response.";
 }
 
-
+// Create or resume an AI conversation thread
+// Ensure thread exists or create one
+async function getOrCreateThread() {
+    if (!currentThreadId) {
+        const thread = await createThread();
+        if (thread && thread.id) {
+            currentThreadId = thread.id;
+            console.log(`New thread created: ${currentThreadId}`);
+        } else {
+            throw new Error("Failed to create thread.");
+        }
+    }
+    return currentThreadId;
+}
 
 
 
@@ -215,5 +228,6 @@ module.exports = {
     runThread,
     getThreadMessages,
     handleCommand,
-    ensureAssistant
+    ensureAssistant,
+    getOrCreateThread
 };
