@@ -185,21 +185,24 @@ async function handleCommand(req, res) {
 
         // Get the latest messages from the thread
         let messages = await aiServices.getThreadMessages(threadId) || [];
-        console.log('🗨️ Raw thread messages:', messages);
+        console.log('🗨️ Full Thread Message Response:', messages);
 
-        // Ensure messages are an array
-        if (messages && typeof messages === 'object' && !Array.isArray(messages)) {
-            console.log('🔍 Detected object response for messages. Extracting...');
-            messages = messages.messages || messages.data || [];
+        // Extract and clean the message content
+        if (Array.isArray(messages.data)) {
+            messages = messages.data.map(msg => {
+                return msg.content?.map(c => c.text?.value).join('\n') || msg.text?.value || '';
+            }).filter(Boolean);
+        } else {
+            messages = [];
         }
-        messages = Array.isArray(messages) ? messages : [];
 
-        // Always return the most recent assistant response
+        console.log(`📜 Cleaned Messages (count: ${messages.length}):`, messages);
+
+        // Return the latest meaningful message or fallback
         const latestMessage = messages.length > 0
-            ? messages[messages.length - 1]  // Get the most relevant output
+            ? messages[messages.length - 1]
             : 'Command executed successfully.';
         
-        console.log(`📜 Final message list (count: ${messages.length}):`, messages);
         console.log(`📤 Returning response: "${latestMessage}"`);
         res.json({ status: 'success', result: latestMessage });
 
@@ -208,6 +211,7 @@ async function handleCommand(req, res) {
         res.status(500).json({ error: 'Failed to process command' });
     }
 }
+
 
 
 
