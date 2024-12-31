@@ -136,51 +136,62 @@ async function addMessageToThread(threadId, message) {
 
 // Updated to call ensureAssistant()
 async function runThread(threadId) {
-    try {
-        const assistantId = await ensureAssistant();
-        const response = await openaiClient.beta.threads.runs.create(threadId, {
-            assistant_id: assistantId,
-        });
-        return response;
-    } catch (error) {
-        console.error('Error running thread:', error.message);
-        throw error;
+    const assistantId = await ensureAssistant();  // Ensure an assistant is loaded
+    const run = await openaiClient.beta.threads.runs.create(threadId, {
+        assistant_id: assistantId,
+    });
+
+    console.log(`Thread started. Run ID: ${run.id}`);
+
+    // Poll the run until it's completed
+    let runStatus = await openaiClient.beta.threads.runs.retrieve(run.id);
+    while (runStatus.status === "queued" || runStatus.status === "in_progress") {
+        await new Promise(resolve => setTimeout(resolve, 1000));  // Wait 1 second
+        runStatus = await openaiClient.beta.threads.runs.retrieve(run.id);
     }
+
+    console.log(`Run completed. Status: ${runStatus.status}`);
+    return runStatus;
 }
+
 
 // Retrieve thread messages
 async function getThreadMessages(threadId) {
     try {
         const response = await openaiClient.beta.threads.messages.list(threadId);
-        return response.data;
+        if (response && response.data) {
+            console.log("AI Thread Messages:", JSON.stringify(response.data, null, 2));
+        }
+        return response.data;  // Return all messages in the thread
     } catch (error) {
         console.error('Error retrieving thread messages:', error.message);
         throw error;
     }
 }
 
+
 // Enhanced command handler
 async function handleCommand(command) {
-    const threadId = await ensureThread();
-    await addMessageToThread(threadId, command);
+    const threadId = await ensureThread();  // Ensure a thread exists or create one
+    await addMessageToThread(threadId, command);  // Add user message to thread
     
-    // Explicitly run the thread and wait for completion
-    const runResponse = await runThread(threadId);
-    
+    // Explicitly run the thread
+    const runResponse = await runThread(threadId);  
+
     if (!runResponse || !runResponse.id) {
         throw new Error("Failed to run thread.");
     }
-    
-    // Fetch messages again after the assistant processes the command
-    const messages = await getThreadMessages(threadId);
-    const latestMessage = messages[messages.length - 1];  // Get the latest AI response
 
-    // Log the latest AI response for debugging
+    // Wait for the thread to complete processing
+    const messages = await getThreadMessages(threadId);
+    const latestMessage = messages[messages.length - 1];  // Fetch latest assistant message
+
+    // Debugging: Log entire message object
     console.log("Latest AI Response Object:", JSON.stringify(latestMessage, null, 2));
 
     let responseText = '';
 
-    // Extract the assistant's response from the message content
+    // Extract assistant's response (filter out user messages)
     if (latestMessage && latestMessage.role === 'assistant' && latestMessage.content) {
         latestMessage.content.forEach(item => {
             if (item.type === 'text' && item.text && item.text.value) {
@@ -191,6 +202,7 @@ async function handleCommand(command) {
 
     return responseText.trim() || "AI did not return a response.";
 }
+
 
 
 
