@@ -9,7 +9,7 @@ body, html {
     overflow: hidden;
 }
 
-/* Main Layout (Flexbox for Consistent Sidebar Behavior) */
+/* Main Layout */
 .desk-container {
     display: flex;
     justify-content: space-between;
@@ -18,23 +18,25 @@ body, html {
     gap: 20px;
 }
 
-/* Left Sidebar */
+/* Left and Right Sidebar */
 .left-sidebar, .right-sidebar {
     display: flex;
     flex-direction: column;
-    width: 25%;
+    width: 20%;  /* Keep sidebars narrow */
     gap: 20px;
 }
 
-/* Main CRT Display */
+/* Main CRT Display (Larger Center) */
 .monitor-frame {
+    flex-grow: 3;  /* Make this section expand more */
     display: flex;
     flex-direction: column;
-    justify-content: space-between;  /* Push input to bottom */
+    justify-content: space-between;
     height: 100%;
     background: #111;
     border: 15px solid #333;
     border-radius: 12px;
+    padding: 20px;
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
     overflow: hidden;
 }
@@ -52,15 +54,18 @@ body, html {
 }
 
 
+/* Console Text Area (Inside Monitor) */
 .console {
-    height: 85%;
+    flex-grow: 1;
     padding: 15px;
     overflow-y: auto;
     font-size: 18px;
-    color: #0f0;
+    color: #0f0;  /* Retro green text */
 }
 
+
 /* Command Bar */
+/* Command Input (Fixed to Bottom of CRT) */
 .command-input {
     display: flex;
     padding: 15px;
@@ -93,13 +98,6 @@ body, html {
 
 .command-input button:hover {
     background: #5f5;
-}
-
-/* Side Panel */
-.side-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
 }
 
 /* Avatar Section */
