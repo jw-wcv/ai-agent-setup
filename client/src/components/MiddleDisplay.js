@@ -1,3 +1,5 @@
+// MiddleDisplay.js
+
 import React, { useState } from 'react';
 import '../styles/MiddleDisplay.css';
 import axios from 'axios';

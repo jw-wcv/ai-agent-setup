@@ -1,4 +1,3 @@
-/* General Reset */
 body, html {
     margin: 0;
     padding: 0;
@@ -7,64 +6,61 @@ body, html {
     color: #fff;
     height: 100%;
     overflow: hidden;
-  }
-  
-  /* Main Layout */
-  .desk-container {
+}
+
+/* Main Layout */
+.desk-container {
     display: flex;
     justify-content: space-between;
     height: 100vh;
     padding: 20px;
     gap: 20px;
     overflow: hidden;
-  }
-  
-  /* Responsive Layout */
-  @media (max-width: 1200px) {
+}
+
+.left-sidebar, .right-sidebar {
+    flex: 1 1 20%;
+    max-width: 350px;
+    min-width: 300px;
+}
+
+.monitor-frame {
+    flex: 2 1 55%;
+    max-width: 900px;
+    min-width: 600px;
+}
+
+/* Responsive Layout */
+@media (max-width: 1200px) {
     .desk-container {
         flex-direction: column;
         align-items: center;
         overflow-y: auto;
     }
-  
+
     .left-sidebar, .right-sidebar {
         flex: none;
         width: 100%;
     }
-  
+
     .monitor-frame {
         width: 100%;
     }
-  
-    .skills-container {
-        flex-direction: column;
-    }
-  
-    .skill-branch {
-        flex: none;
-        width: 100%;
-    }
-  }
-  
-  @media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
     .desk-container {
         flex-direction: column;
         overflow-y: auto;
     }
-  
+
     .left-sidebar, .right-sidebar {
         width: 100%;
         order: 2;
     }
-  
+
     .monitor-frame {
         order: 1;
         height: 60vh;
     }
-  
-    .skills-container {
-        flex-direction: column;
-        align-items: center;
-    }
-  }
-  
+}

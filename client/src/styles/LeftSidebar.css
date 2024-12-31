@@ -1,87 +1,138 @@
-/* Left Sidebar */
 .left-sidebar {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 25%;
-    gap: 20px;
-    max-width: 400px;
-    overflow-y: auto;
-  }
-  
-  /* Avatar Section */
-  .agent-avatar {
-    text-align: center;
-    background: #222;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
-    animation: avatarGlow 5s infinite alternate;
-  }
-  
-  .agent-avatar img {
-    width: 140px;
-    border-radius: 50%;
-  }
-  
-  .status {
-    margin-top: 10px;
-    font-size: 18px;
-    color: #0f0;
-  }
-  
-  /* Health Bar */
-  .health-bar {
-    width: 100%;
-    height: 20px;
-    background: #300;
-    border: 1px solid #900;
-    margin-top: 15px;
-    border-radius: 5px;
-    overflow: hidden;
-    box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.5);
-  }
-  
-  .health-fill {
-    height: 100%;
-    width: 100%;
-    background: #0f0;
-    transition: width 0.5s ease-in-out;
-  }
-  
-  /* Trending Board */
-  .trending-board {
-    margin-top: 30px;
-    background: #333;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-    flex: 1;
-    min-height: 200px;
-  }
-  
-  .post-input {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-  }
-  
-  .post-input input {
-    flex-grow: 1;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #5f5;
-    background: #000;
-    color: #0f0;
-    border-radius: 5px;
-  }
-  
-  .post-input button {
-    background: #5f5;
-    border: none;
-    padding: 10px 15px;
-    cursor: pointer;
-    color: #000;
-    font-weight: bold;
-    border-radius: 5px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 25%;
+  max-width: 350px;
+  min-width: 300px;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+/* Avatar Section */
+.agent-avatar {
+  text-align: center;
+  background: #222;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+  animation: avatarGlow 5s infinite alternate;
+}
+
+.agent-avatar img {
+  width: 140px;
+  border-radius: 50%;
+}
+
+.status {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #0f0;
+}
+
+/* Health Bar */
+.health-bar {
+  width: 100%;
+  height: 20px;
+  background: #300;
+  border: 1px solid #900;
+  margin-top: 15px;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+.health-fill {
+  height: 100%;
+  width: 100%;
+  background: #0f0;
+  transition: width 0.5s ease-in-out;
+}
+
+/* Trending Board */
+.trending-board {
+  margin-top: 30px;
+  background: #333;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.post-input {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.post-input input {
+  flex-grow: 1;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #5f5;
+  background: #000;
+  color: #0f0;
+  border-radius: 5px;
+}
+
+.post-input button {
+  background: #5f5;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  color: #000;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+/* Skill Tree */
+.skill-tree {
+  margin-top: 30px;
+  background: #333;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+}
+
+.skills-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.skill-branch {
+  flex: 1 1 45%;
+  text-align: center;
+  margin: 10px;
+  min-width: 200px;
+}
+
+.skill-branch h3 {
+  margin-bottom: 15px;
+}
+
+.skill-branch ul {
+  list-style: none;
+  padding: 0;
+}
+
+.skill-branch li {
+  margin: 15px 0;
+  padding: 12px;
+  background: #222;
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+.unlock-btn {
+  padding: 8px 12px;
+  background: #0f0;
+  color: #000;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 5px;
+}
+
+.unlock-btn:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
