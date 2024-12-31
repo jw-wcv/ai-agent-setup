@@ -30,14 +30,14 @@ sudo apt install -y curl gnupg apt-transport-https python3 python3-pip build-ess
 
 
 # Install MongoDB
-log_message "Checking and installing MongoDB..."
+log_message "Checking and installing MongoDB 4.4..."
 if ! command -v mongod &> /dev/null
 then
-    log_message "MongoDB not found. Installing MongoDB 4.4..."
+    log_message "Installing MongoDB 4.4..."
     curl -fsSL https://www.mongodb.org/static/pgp/server-4.4.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-4.4.gpg
     echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-4.4.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
     sudo apt update
-    sudo apt install -y mongodb-org
+    sudo apt install -y mongodb-org=4.4.18 mongodb-org-server=4.4.18 mongodb-org-shell=4.4.18 mongodb-org-mongos=4.4.18 mongodb-org-tools=4.4.18
 else
     log_message "MongoDB is already installed."
 fi
