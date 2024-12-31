@@ -4,6 +4,7 @@ require('dotenv').config();
 const { OpenAI } = require('openai');
 const fs = require('fs');
 const path = require('path');
+const AssistantModel = require('../database/models/Assistant'); // Mongoose Model
 
 // Use CONFIG_DIR from .env or fallback to default
 const configPath = process.env.CONFIG_DIR || path.join(__dirname, '../../server/config');
@@ -22,6 +23,33 @@ try {
 const openaiClient = new OpenAI({
     apiKey: apiKey
 });
+
+async function ensureAssistant() {
+    try {
+        let assistant = await AssistantModel.findOne({});
+        if (!assistant) {
+            const newAssistant = await createAssistant(
+                "AI Virtual Machine Agent",
+                "Manage virtual machines and execute commands based on user input.",
+                "Virtual assistant capable of handling VM tasks"
+            );
+            assistant = new AssistantModel({
+                assistantId: newAssistant.id,
+                name: newAssistant.name,
+                instructions: newAssistant.instructions,
+                description: newAssistant.description
+            });
+            await assistant.save();
+            console.log(`New Assistant Created and Stored: ${newAssistant.id}`);
+        } else {
+            console.log(`Using Existing Assistant: ${assistant.assistantId}`);
+        }
+        return assistant.assistantId;
+    } catch (error) {
+        console.error("Error ensuring assistant:", error.message);
+        throw error;
+    }
+}
 
 // Perform a text completion using OpenAI SDK
 async function doCompletion(prompt, maxTokens = 500, temperature = 0.7) {
@@ -86,9 +114,10 @@ async function addMessageToThread(threadId, message) {
     }
 }
 
-// Run the thread and get results
-async function runThread(threadId, assistantId) {
+// Updated to call ensureAssistant()
+async function runThread(threadId) {
     try {
+        const assistantId = await ensureAssistant();
         const response = await openaiClient.beta.threads.runs.create(threadId, {
             assistant_id: assistantId,
         });

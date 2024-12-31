@@ -183,6 +183,9 @@ app.post('/add-message', async (req, res) => {
 // Run Thread and Get Results
 app.post('/run-thread', async (req, res) => {
     const { threadId } = req.body;
+    if (!threadId) {
+        return res.status(400).json({ error: 'Missing threadId' });
+    }
     try {
         const response = await runThread(threadId);
         res.json({ status: 'success', response });
@@ -190,6 +193,7 @@ app.post('/run-thread', async (req, res) => {
         res.status(500).json({ error: 'Failed to run thread' });
     }
 });
+
 
 // Fetch Messages from a Thread
 app.get('/thread-messages', async (req, res) => {
