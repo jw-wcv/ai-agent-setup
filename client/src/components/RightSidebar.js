@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/RightSidebar.css';
-import axios from 'axios';
 
 function RightSidebar() {
     const [xp, setXp] = useState(1200);
@@ -19,10 +18,34 @@ function RightSidebar() {
         trade2: 'trade1',
     };
 
+    // Simulate API responses for agent stats and wallet
+    const simulateApiResponse = (endpoint) => {
+        if (endpoint === '/api/agents/stats') {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        xp: 1200 + Math.floor(Math.random() * 200),
+                        health: Math.max(health - 10, 20), // Reduce health gradually
+                        skillPoints: skillPoints + 1
+                    });
+                }, 1000);
+            });
+        } else if (endpoint === '/api/agents/wallet') {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    resolve({
+                        items: ['🪙', '💎', '🔮', '⚙️', '📜', '🔑', '🔧', '🔬']
+                    });
+                }, 1000);
+            });
+        }
+    };
+
     useEffect(() => {
         fetchStats();
         fetchWalletItems();
 
+        // Simulate periodic XP, health, and skill point updates
         const interval = setInterval(() => {
             setHealth((prev) => Math.max(prev - 10, 0));
             setXp((prev) => prev + 50);
@@ -40,22 +63,21 @@ function RightSidebar() {
 
     const fetchStats = async () => {
         try {
-            const response = await axios.get('/api/agents/stats');
-            const { xp, health, skillPoints } = response.data;
-            setXp(xp);
-            setHealth(health);
-            setSkillPoints(skillPoints);
+            const response = await simulateApiResponse('/api/agents/stats');
+            setXp(response.xp);
+            setHealth(response.health);
+            setSkillPoints(response.skillPoints);
         } catch (error) {
-            console.error('Failed to fetch agent stats');
+            console.error('Failed to fetch agent stats (Simulated)');
         }
     };
 
     const fetchWalletItems = async () => {
         try {
-            const response = await axios.get('/api/agents/wallet');
-            setWalletItems(response.data.items);
+            const response = await simulateApiResponse('/api/agents/wallet');
+            setWalletItems(response.items);
         } catch (error) {
-            console.error('Failed to load wallet items');
+            console.error('Failed to load wallet items (Simulated)');
         }
     };
 
