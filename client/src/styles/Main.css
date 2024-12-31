@@ -1,14 +1,5 @@
-/* Main Layout */
+/* Main.css */
 
-body, html {
-    margin: 0;
-    padding: 0;
-    font-family: 'Courier New', monospace;
-    background-color: #1e1e1e;
-    color: #fff;
-    height: 100%;
-    overflow: hidden;
-}
 
 .desk-container {
     display: flex;
@@ -17,80 +8,67 @@ body, html {
     padding: 20px;
     gap: 20px;
     overflow: hidden;
-  }
-
-  .left-sidebar, .right-sidebar {
-    flex: 1 1 25%;
-    max-width: 350px;
-    min-width: 300px;
 }
 
+.left-sidebar, .right-sidebar {
+    flex: 1 1 20%;
+    max-width: 350px;
+    min-width: 300px;
+    overflow-y: auto;
+    height: calc(100vh - 40px);  /* Fit within viewport */
+}
 
 .monitor-frame {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 100%;
+    justify-content: flex-start;
+    height: calc(100vh - 40px);
     background: #111;
     border: 15px solid #333;
     border-radius: 12px;
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
-    overflow: hidden;
     flex: 2 1 60%;
     max-width: 1000px;
     min-width: 600px;
     min-height: 500px;
-  }
-  
-  
-
-/* General Card Styling for Consistent Layout */
-.agent-stats, 
-.trending-board, 
-.skill-tree, 
-.todo-list, 
-.wallet-section, 
-.task-tree {
-  background: #333;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+    overflow: hidden;
 }
 
 /* Responsive Layout */
 @media (max-width: 1200px) {
     .desk-container {
-      flex-direction: column;
-      align-items: center;
-      overflow-y: auto;
-      height: auto;
+        flex-direction: column;
+        align-items: center;
+        overflow-y: auto;
+        height: auto;
     }
   
     .left-sidebar, .right-sidebar {
-      flex: none;
-      width: 100%;
+        flex: none;
+        width: 100%;
+        height: auto;
     }
   
     .monitor-frame {
-      width: 100%;
-      min-height: 500px;
+        width: 100%;
+        min-height: 500px;
     }
-  }
-  
-  @media (max-width: 768px) {
+}
+
+@media (max-width: 768px) {
     .desk-container {
         flex-direction: column;
         overflow-y: auto;
         height: auto;
-      }
+    }
   
     .left-sidebar, .right-sidebar {
-      width: 100%;
-      order: 2;
+        width: 100%;
+        order: 2;
     }
   
     .monitor-frame {
-      order: 1;
-      height: 60vh;
+        order: 1;
+        height: 60vh;
     }
-  }
+}
