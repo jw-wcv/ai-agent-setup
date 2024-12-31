@@ -1,9 +1,8 @@
+/* RightSidebar.css */
+
 .right-sidebar {
     display: flex;
     flex-direction: column;
-    flex: 1 1 25%;
-    max-width: 350px;
-    min-width: 300px;
     gap: 20px;
     overflow-y: auto;
 }
@@ -41,3 +40,9 @@
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
 }
+
+.task-tree {
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  

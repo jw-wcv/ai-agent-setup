@@ -1,9 +1,8 @@
+/* LeftSidebar.css */
+
 .left-sidebar {
   display: flex;
   flex-direction: column;
-  flex: 1 1 25%;
-  max-width: 350px;
-  min-width: 300px;
   gap: 20px;
   overflow-y: auto;
 }
@@ -90,19 +89,22 @@
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
+  max-height: 50vh;
+  overflow-y: auto;
 }
+
 
 .skills-container {
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 .skill-branch {
-  flex: 1 1 45%;
-  text-align: center;
-  margin: 10px;
-  min-width: 200px;
+  flex: 1 1 calc(50% - 20px);
+  margin-bottom: 20px;
+  min-width: 220px;
+  box-sizing: border-box;
 }
 
 .skill-branch h3 {
@@ -121,6 +123,17 @@
   border-radius: 8px;
   border: 1px solid #444;
 }
+
+.skill-tree::-webkit-scrollbar,
+.task-tree::-webkit-scrollbar {
+  width: 10px;
+}
+.skill-tree::-webkit-scrollbar-thumb,
+.task-tree::-webkit-scrollbar-thumb {
+  background-color: #0f0;
+  border-radius: 10px;
+}
+
 
 .unlock-btn {
   padding: 8px 12px;
