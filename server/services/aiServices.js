@@ -172,12 +172,15 @@ async function handleCommand(command) {
     const messages = await getThreadMessages(threadId);
     const latestMessage = messages[messages.length - 1];  // Get the last message
 
+    // Log the entire latest message to debug the structure
+    console.log("Latest AI Response Object:", JSON.stringify(latestMessage, null, 2));
+
     let responseText = '';
 
-    // Extract the response from content array (content could contain multiple segments)
+    // Properly extract and format the AI response from nested object
     if (latestMessage && latestMessage.content) {
         latestMessage.content.forEach(item => {
-            if (item.text && item.text.value) {
+            if (item.type === 'text' && item.text && item.text.value) {
                 responseText += item.text.value + ' ';
             }
         });
@@ -185,6 +188,8 @@ async function handleCommand(command) {
 
     return responseText.trim() || "AI did not return a response.";
 }
+
+
 
 
 
