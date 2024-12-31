@@ -1,7 +1,7 @@
 // dbRoutes.js
 
 const express = require('express');
-const databaseController = require('../controllers/databaseController');
+const databaseController = require('../controllers/dbController');
 
 const router = express.Router();
 
