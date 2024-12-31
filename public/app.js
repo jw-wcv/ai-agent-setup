@@ -24,41 +24,36 @@ document.addEventListener("DOMContentLoaded", function () {
     async function sendCommand() {
         const command = commandInput.value;
         if (command) {
-            const response = await fetch('/api/ai/command', {  // Updated path to /api/ai
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ command })
-            });
-            const data = await response.json();
-            
-            consoleDiv.innerHTML += `<div>User: ${command}</div>`;
-            
-            if (data.status === 'success') {
-                const aiResponse = data.result;
-
-                let aiMessage = '';
-                // Properly handle string or object response
-                if (typeof aiResponse === 'string') {
-                    aiMessage = aiResponse;
-                } else if (Array.isArray(aiResponse)) {
-                    aiResponse.forEach((item) => {
-                        if (item.text && item.text.value) {
-                            aiMessage += item.text.value + ' ';
-                        }
-                    });
-                } else {
-                    aiMessage = JSON.stringify(aiResponse);
+            try {
+                const response = await fetch('/api/ai/command', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ command })
+                });
+    
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
                 }
-
-                consoleDiv.innerHTML += `<div>AI: ${aiMessage.trim()}</div>`;
-            } else {
-                consoleDiv.innerHTML += `<div>Error processing command.</div>`;
+    
+                const data = await response.json();
+                
+                consoleDiv.innerHTML += `<div>User: ${command}</div>`;
+                
+                if (data.status === 'success') {
+                    const aiResponse = data.result;
+                    consoleDiv.innerHTML += `<div>AI: ${aiResponse}</div>`;
+                } else {
+                    consoleDiv.innerHTML += `<div>Error: ${data.error}</div>`;
+                }
+            } catch (err) {
+                consoleDiv.innerHTML += `<div>Error contacting AI agent: ${err.message}</div>`;
             }
-
+    
             commandInput.value = '';
             consoleDiv.scrollTop = consoleDiv.scrollHeight;
         }
     }
+    
 
     // Event listeners for button click and enter key
     sendBtn.addEventListener("click", sendCommand);

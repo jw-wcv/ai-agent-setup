@@ -29,5 +29,7 @@ router.post('/get-completion', aiController.getCompletion);
 
 // Greet Route
 router.get('/greet', aiController.greetUser);  // Add new route for greeting
+router.post('/command', aiController.handleCommand);  // Add this route for handling user commands
+
 
 module.exports = router;
