@@ -28,6 +28,20 @@ log_message "Installing required dependencies..."
 sudo apt update
 sudo apt install -y curl gnupg apt-transport-https python3 python3-pip build-essential ufw > /dev/null 2>&1
 
+log_message "Checking and installing libssl1.1 for MongoDB 4.4..."
+if ! dpkg -l | grep -q libssl1.1; then
+    log_message "libssl1.1 not found. Downloading and installing..."
+
+    if [ "$(uname -m)" = "x86_64" ]; then
+        wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+    elif [ "$(uname -m)" = "aarch64" ]; then
+        wget http://ports.ubuntu.com/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_arm64.deb
+        sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_arm64.deb
+    fi
+
+    log_message "libssl1.1 installed."
+fi
 
 # Install MongoDB
 log_message "Checking and installing MongoDB 4.4..."
