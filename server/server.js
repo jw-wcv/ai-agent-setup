@@ -10,6 +10,10 @@ const { whitelistMiddleware } = require('./middleware/whitelistMiddleware');
 const aiRoutes = require('./routes/aiRoutes');  // Correct import
 const databaseRoutes = require('./routes/dbRoutes');
 
+// Define models here 
+const ServiceManager = require('./services/service_manager.js');
+const serviceManager = new ServiceManager();
+
 // Express App Setup
 const app = express();
 
@@ -51,6 +55,17 @@ app.get('/vm-log-stream', (req, res) => {
         logStream.kill();
     });
 });
+
+// Endpoint to list all available services
+app.post('/api/list-services', authenticateToken, async (req, res) => {
+    try {
+        const services = serviceManager.listAllServices();
+        res.json({ services });
+    } catch (error) {
+        console.error('Error listing services:', error);
+        res.status(500).json({ error: 'Error listing services' });
+    }
+  });
 
 // Start Server
 const server = app.listen(8080, () => {
