@@ -165,7 +165,7 @@ if [ -f "package.json" ]; then
         pm2 restart ai-agent-server
     else
         log_message "Starting new PM2 process for AI Agent..."
-        pm2 start server/server.js --name ai-agent-server
+        pm2 start ai-agent-server/server/server.js --name ai-agent-server
     fi
 
     pm2 startup
