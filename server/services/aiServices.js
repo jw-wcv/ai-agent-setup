@@ -1,3 +1,5 @@
+// aiServices.js
+
 require('dotenv').config();
 const { OpenAI } = require('openai');
 const fs = require('fs');
@@ -6,7 +8,7 @@ const path = require('path');
 // Use CONFIG_DIR from .env or fallback to default
 const configPath = process.env.CONFIG_DIR || path.join(__dirname, '../../server/config');
 const keysPath = path.join(configPath, 'keys/api_key.txt');
-
+let activeThreadId = null;
 let apiKey;
 try {
     apiKey = fs.readFileSync(keysPath, 'utf8').trim();
@@ -25,7 +27,7 @@ const openaiClient = new OpenAI({
 async function doCompletion(prompt, maxTokens = 500, temperature = 0.7) {
     try {
         const response = await openaiClient.chat.completions.create({
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4-turbo',
             messages: [{ role: 'user', content: prompt }],
             max_tokens: maxTokens,
             temperature: temperature
@@ -108,11 +110,29 @@ async function getThreadMessages(threadId) {
     }
 }
 
+// Start or resume thread
+async function ensureThread() {
+    if (!activeThreadId) {
+        const thread = await createThread();
+        activeThreadId = thread.id;
+    }
+    return activeThreadId;
+}
+
+// Enhanced command handler
+async function handleCommand(command) {
+    const threadId = await ensureThread();
+    const response = await addMessageToThread(threadId, command);
+    await runThread(threadId);
+    return await getThreadMessages(threadId);
+}
+
 module.exports = {
     doCompletion,
     createAssistant,
     createThread,
     addMessageToThread,
     runThread,
-    getThreadMessages
+    getThreadMessages,
+    handleCommand
 };

@@ -35,6 +35,13 @@
             } catch (err) {
                 consoleDiv.innerHTML += `<div>Error contacting AI agent.</div>`;
             }
+
+            // Start VM Log Stream
+            const vmLogStream = new EventSource('/vm-log-stream');
+            vmLogStream.onmessage = (event) => {
+                consoleDiv.innerHTML += `<div class="log">[VM LOG] ${event.data}</div>`;
+                consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            };
         };
 
         // Send user command to server

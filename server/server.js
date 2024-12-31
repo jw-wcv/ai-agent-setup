@@ -1,3 +1,5 @@
+// server.js
+
 require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
@@ -27,6 +29,18 @@ const whitelistPath = `${configPath}/ipwhitelist.txt`;
 let apiKey = fs.readFileSync(path.join(configPath, 'keys/api_key.txt'), 'utf8').trim();
 const openai = new OpenAI({ apiKey });
 
+// In-memory active thread
+let currentThreadId = null;
+
+// Create or resume an AI conversation thread
+async function getOrCreateThread() {
+    if (!currentThreadId) {
+        const thread = await createThread();
+        currentThreadId = thread.id;
+        console.log(`New thread created: ${currentThreadId}`);
+    }
+    return currentThreadId;
+}
 
 // Helper to normalize IP addresses (IPv4-mapped IPv6)
 const formatIP = (ip) => (ip.includes('::ffff:') ? ip.split('::ffff:')[1] : ip);
@@ -81,8 +95,26 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(publicDir, 'index.html'));
 });
 
-// AI Greeting for New Sessions
+// Real-time streaming for logs
+app.get('/vm-log-stream', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+
+    const stream = spawn('tail', ['-f', '/var/log/syslog']);
+
+    stream.stdout.on('data', (data) => {
+        res.write(`data: ${data.toString()}\n\n`);
+    });
+
+    req.on('close', () => {
+        stream.kill();
+    });
+});
+
+
+// Greet user on load
 app.get('/greet', async (req, res) => {
+    const threadId = await getOrCreateThread();
     const greetingPrompt = "Greet the user and ask how you can help today.";
     
     try {
@@ -90,26 +122,28 @@ app.get('/greet', async (req, res) => {
         console.log(`AI Greeting Response: ${result}`);
         res.json({ status: 'success', result });
     } catch (err) {
-        console.error('Error generating greeting:', err.message);
         res.status(500).json({ error: 'Failed to process greeting' });
     }
 });
 
-// Handle POST /command with OpenAI
-app.post('/command', express.json(), async (req, res) => {
+
+// Handle POST /command with thread management
+app.post('/command', async (req, res) => {
     const { command } = req.body;
-    console.log(`Received command: ${command}`);
+    const threadId = await getOrCreateThread();
 
     if (!command) {
         return res.status(400).json({ error: 'No command provided' });
     }
 
     try {
-        const result = await doCompletion(command);
-        console.log(`OpenAI Response: ${result}`);
-        res.json({ status: 'success', result });
+        const response = await addMessageToThread(threadId, command);
+        await runThread(threadId);
+        const messages = await getThreadMessages(threadId);
+        
+        const latestMessage = messages[messages.length - 1]?.content || "No response from AI.";
+        res.json({ status: 'success', result: latestMessage });
     } catch (err) {
-        console.error('Error generating AI response:', err.message);
         res.status(500).json({ error: 'Failed to process command' });
     }
 });
