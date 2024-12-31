@@ -9,11 +9,52 @@ document.addEventListener("DOMContentLoaded", function () {
     const postsFeed = document.getElementById('postsFeed');
     const walletGrid = document.getElementById('walletGrid');
 
+    const computeStat = document.getElementById('computeStat');
+    const intelStat = document.getElementById('intelStat');
+    const collabStat = document.getElementById('collabStat');
+    const xpStat = document.getElementById('xpStat');
+    const taskTree = document.getElementById('taskTree');
+
     // Greet user when the page loads
     window.onload = () => {
        // greetUser();
         listenForActivity();
     };
+
+    const skillPointsSpan = document.getElementById('skillPoints');
+    const unlockButtons = document.querySelectorAll('.unlock-btn');
+    let skillPoints = parseInt(skillPointsSpan.textContent);
+
+    // Skill Dependencies
+    const skillDependencies = {
+        compute2: 'compute1',
+        compute3: 'compute2',
+        trade2: 'trade1',
+        trade3: 'trade2',
+        collab2: 'collab1',
+        collab3: 'collab2',
+    };
+
+    // Unlock Skill Function
+    unlockButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const skill = e.target.dataset.skill;
+
+            if (skillPoints > 0) {
+                e.target.textContent = 'Unlocked';
+                e.target.disabled = true;
+                skillPoints -= 1;
+                skillPointsSpan.textContent = skillPoints;
+
+                // Enable dependent skills
+                for (const [dependent, requirement] of Object.entries(skillDependencies)) {
+                    if (requirement === skill) {
+                        document.querySelector(`button[data-skill="${dependent}"]`).disabled = false;
+                    }
+                }
+            }
+        });
+    });
 
      // Simulate Wallet Items
      const walletItems = ['🪙', '💎', '🔮', '⚙️', '📜', '🔑'];
@@ -35,7 +76,33 @@ document.addEventListener("DOMContentLoaded", function () {
     // Periodically drop health for fun
     setInterval(() => {
         reduceHealth(10);
+        let xp = parseInt(xpStat.textContent);
+        xp += 50;
+        xpStat.textContent = xp;
+
+        // Simulate stat growth over time
+        computeStat.textContent = Math.min(100, parseInt(computeStat.textContent) + 1);
+        intelStat.textContent = Math.min(100, parseInt(intelStat.textContent) + 1);
+        collabStat.textContent = Math.min(100, parseInt(collabStat.textContent) + 2);
     }, 10000);
+
+    // Simulate XP Gain to Earn Skill Points
+    setInterval(() => {
+        skillPoints += 1;
+        skillPointsSpan.textContent = skillPoints;
+    }, 20000);  // Gain skill point every 20 seconds
+
+     // Dynamically Add Tasks to Tree
+     function addTaskToTree(taskName, parentTask) {
+        const newTask = document.createElement('li');
+        newTask.innerHTML = `🔄 ${taskName}`;
+        parentTask.appendChild(newTask);
+    }
+
+    // Example: Adding Subtask After Command
+    document.getElementById('sendBtn').addEventListener('click', () => {
+        addTaskToTree('Compute Allocation', taskTree.children[0].children[0]);  // Append to Main Agent
+    });
  
 
     // Send command to AI agent
