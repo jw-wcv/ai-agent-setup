@@ -27,6 +27,39 @@ log_message "Installing required dependencies..."
 sudo apt update
 sudo apt install -y curl gnupg apt-transport-https python3 python3-pip build-essential ufw > /dev/null 2>&1
 
+
+# Install MongoDB
+log_message "Checking and installing MongoDB..."
+if ! command -v mongod &> /dev/null
+then
+    log_message "MongoDB not found. Installing MongoDB..."
+    curl -fsSL https://www.mongodb.org/static/pgp/server-6.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-6.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+    sudo apt update
+    sudo apt install -y mongodb-org
+else
+    log_message "MongoDB is already installed."
+fi
+
+log_message "Starting and enabling MongoDB service..."
+sudo systemctl start mongod
+sudo systemctl enable mongod
+
+# Retry starting MongoDB if it fails
+if ! systemctl is-active --quiet mongod
+then
+    log_message "MongoDB failed to start. Attempting repair..."
+    sudo mongod --repair
+    sudo systemctl start mongod
+    if ! systemctl is-active --quiet mongod
+    then
+        log_message "MongoDB still failed to start after repair. Exiting."
+        exit 1
+    fi
+fi
+
+log_message "MongoDB is running."
+
 # Move misplaced config files (if any)
 if [ -d /root/config ]; then
     log_message "Moving files from /root/config to $CONFIG_DIR..."
@@ -80,6 +113,9 @@ sudo systemctl enable --now docker
 log_message "Configuring firewall (UFW)..."
 sudo ufw allow ssh
 sudo ufw default deny incoming
+
+log_message "Allowing MongoDB port 27017 for local connections..."
+sudo ufw allow 27017
 
 while read -r ip; do
     log_message "Processing IP: $ip"

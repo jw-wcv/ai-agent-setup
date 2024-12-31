@@ -6,7 +6,7 @@ const os = require('os');
 const { spawn } = require('child_process');
 const { OpenAIApi, OpenAI } = require('openai');
 const db = require('./server/services/dbServices'); 
-const Assistant = require('./server/models/Assistant');
+const Assistant = require('./server/database/models/Assistant');
 const { 
     doCompletion, 
     createAssistant, 
