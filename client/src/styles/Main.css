@@ -1,31 +1,47 @@
 /* Main.css */
 
 .desk-container {
-    display: flex;
-    flex-direction: row;
-    height: 100vh;  /* Full viewport height */
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;  /* Sidebars take 1/3, monitor takes 2/3 */
+    grid-template-rows: auto;
+    height: 100vh;
     padding: 20px;
     gap: 20px;
-    overflow: hidden;  /* Prevent full page scroll */
+    box-sizing: border-box;
 }
 
 .left-sidebar, .right-sidebar {
-    flex: 1 1 20%;  /* Sidebar takes 20% but can grow/shrink */
-    max-width: 350px;
-    min-width: 280px;
-    overflow-y: auto;  /* Scroll if content overflows */
+    max-width: 100%;   /* Full width if shrunk */
+    overflow-y: auto;
 }
 
 .monitor-frame {
-    flex: 2 1 60%;  /* Monitor grows with available space */
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    background: #111;
     border: 15px solid #333;
     border-radius: 12px;
     box-shadow: 0 0 25px rgba(0, 255, 0, 0.5);
     overflow: hidden;
+    flex-grow: 1;
+    min-height: 0;
+}
+
+/* Ensure the CRT screen grows while keeping input at bottom */
+.crt {
+    flex-grow: 1;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* Sidebar Sections */
+.skill-tree, .task-tree {
+    max-height: 45vh;
+    overflow-y: auto;
+}
+
+.wallet-section {
+    height: fit-content;
 }
 
 /* Scrollbar Customization */
@@ -47,37 +63,4 @@
 }
 
 
-/* Responsive Design */
-@media (max-width: 1200px) {
-    .desk-container {
-        flex-direction: column;
-    }
-  
-    .left-sidebar, .right-sidebar {
-        flex: none;
-        width: 100%;
-        max-height: 400px;  /* Limit height for sidebars */
-    }
-  
-    .monitor-frame {
-        width: 100%;
-        flex-grow: 1;
-    }
-}
-  
-@media (max-width: 768px) {
-    .desk-container {
-        flex-direction: column;
-    }
-  
-    .left-sidebar, .right-sidebar {
-        width: 100%;
-        order: 2;
-    }
-  
-    .monitor-frame {
-        order: 1;
-        height: auto;
-        min-height: 400px;
-    }
-}
+
