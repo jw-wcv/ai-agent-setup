@@ -17,7 +17,7 @@ const {
     runThread, 
     getThreadMessages,
     ensureAssistant,
-    handleCommand ,
+    handleCommand,
     getOrCreateThread
 } = require('./services/aiServices');
 
