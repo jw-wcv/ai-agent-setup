@@ -157,7 +157,6 @@ async function greetUser(req, res) {
 
 
 
-
 async function handleCommand(req, res) {
     const { command } = req.body;
 
@@ -187,34 +186,23 @@ async function handleCommand(req, res) {
         let messages = await aiServices.getThreadMessages(threadId) || [];
         console.log('🗨️ Full Thread Message Response:', messages);
 
-        // Extract and clean the message content
-        if (Array.isArray(messages.data)) {
-            messages = messages.data.map(msg => {
-                if (typeof msg === 'string') {
-                    return msg;  // Handle direct string messages
-                }
-                return msg.content?.map(c => c.text?.value).join('\n') || msg.text?.value || '';
-            }).filter(Boolean);
-        } else {
-            messages = [];
+        // Directly return the raw messages without filtering
+        if (!Array.isArray(messages)) {
+            messages = [messages];
         }
-        
 
-        console.log(`📜 Cleaned Messages (count: ${messages.length}):`, messages);
-
-        // Return the latest meaningful message or fallback
-        const latestMessage = messages.length > 0
-            ? messages[messages.length - 1]
-            : 'Command executed successfully.';
+        // Return the entire thread response as plain text
+        const responseText = messages.join('\n') || 'No response from assistant.';
         
-        console.log(`📤 Returning response: "${latestMessage}"`);
-        res.json({ status: 'success', result: latestMessage });
+        console.log(`📤 Returning full thread response:\n${responseText}`);
+        res.json({ status: 'success', result: responseText });
 
     } catch (error) {
         console.error('❌ Error processing command:', error.message);
         res.status(500).json({ error: 'Failed to process command' });
     }
 }
+
 
 
 
