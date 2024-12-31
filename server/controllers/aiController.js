@@ -188,27 +188,31 @@ async function handleCommand(req, res) {
         let messages = await aiServices.getThreadMessages(threadId) || [];
         console.log('🗨️ Raw thread messages:', messages);
 
-        // Force messages to be an array regardless of format
+        // Ensure messages are an array
         if (messages && typeof messages === 'object' && !Array.isArray(messages)) {
             console.log('🔍 Detected object response for messages. Extracting...');
             messages = messages.messages || messages.data || [];
         }
 
-        // Ensure messages is always an array
         messages = Array.isArray(messages) ? messages : [];
-        console.log(`📜 Final message list (count: ${messages.length}):`, messages);
 
-        // Filter out unnecessary greetings
-        const filteredMessages = messages.filter(msg => 
-            typeof msg === 'string' && !msg.includes("assist you today")
-        );
-        console.log(`🧹 Filtered messages (count: ${filteredMessages.length}):`, filteredMessages);
+        // Keep most recent unique responses, filter only exact duplicates
+        const filteredMessages = messages.reduce((acc, msg) => {
+            if (
+                typeof msg === 'string' &&
+                !acc.includes(msg)  // Avoid exact duplicates
+            ) {
+                acc.push(msg);
+            }
+            return acc;
+        }, []);
 
-        // Determine latest message to return
-        const latestMessage = filteredMessages.length > 0
-            ? filteredMessages[filteredMessages.length - 1]
-            : 'Command executed successfully.';
+        // Prioritize AI-generated responses that are not generic greetings
+        const latestMessage = filteredMessages.reverse().find(msg => 
+            !msg.includes("assist you today") && !msg.includes("How can I")
+        ) || 'Command executed successfully.';
         
+        console.log(`📜 Final message list (count: ${filteredMessages.length}):`, filteredMessages);
         console.log(`📤 Returning response: "${latestMessage}"`);
         res.json({ status: 'success', result: latestMessage });
 
@@ -217,6 +221,7 @@ async function handleCommand(req, res) {
         res.status(500).json({ error: 'Failed to process command' });
     }
 }
+
 
 
 
