@@ -62,7 +62,18 @@ async function doCompletion(prompt, maxTokens = 500, temperature = 0.7) {
         });
 
         if (response.choices && response.choices.length > 0) {
-            return response.choices[0].message.content.trim();
+            const completion = response.choices[0].message.content;
+
+            // Extract only the necessary text parts to simplify front-end handling
+            const parsed = JSON.parse(completion);
+            let finalText = '';
+            parsed.forEach(item => {
+                if (item.text && item.text.value) {
+                    finalText += item.text.value + ' ';
+                }
+            });
+
+            return finalText.trim();
         } else {
             throw new Error('No response from OpenAI.');
         }
@@ -71,6 +82,7 @@ async function doCompletion(prompt, maxTokens = 500, temperature = 0.7) {
         throw error;
     }
 }
+
 
 // Create Assistant with OpenAI
 async function createAssistant(name, instructions, description) {

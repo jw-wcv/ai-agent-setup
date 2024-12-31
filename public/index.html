@@ -58,16 +58,21 @@
                 consoleDiv.innerHTML += `<div>User: ${command}</div>`;
                 
                 if (data.status === 'success') {
-                    // Fix: Extract message from OpenAI response
                     const aiResponse = data.result;
         
-                    // If the response is an object, extract the 'content' properly
-                    if (aiResponse && aiResponse.choices) {
-                        const message = aiResponse.choices[0].message.content || 'No response';
-                        consoleDiv.innerHTML += `<div>AI: ${message}</div>`;
+                    // Extract each text segment from the array
+                    let aiMessage = '';
+                    if (Array.isArray(aiResponse)) {
+                        aiResponse.forEach((item) => {
+                            if (item.text && item.text.value) {
+                                aiMessage += item.text.value + ' ';
+                            }
+                        });
                     } else {
-                        consoleDiv.innerHTML += `<div>AI: ${JSON.stringify(aiResponse)}</div>`;
+                        aiMessage = JSON.stringify(aiResponse);
                     }
+        
+                    consoleDiv.innerHTML += `<div>AI: ${aiMessage.trim()}</div>`;
                 } else {
                     consoleDiv.innerHTML += `<div>Error processing command.</div>`;
                 }
