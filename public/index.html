@@ -8,28 +8,10 @@
 </head>
 <body>
     <div class="desk-container">
-        
-        <!-- CRT Monitor Frame -->
-        <div class="monitor-frame">
-            <div class="crt">
-                <div class="console" id="console"></div>
-                <div class="command-input">
-                    <input type="text" id="command" placeholder="Type your message..." autofocus>
-                    <button id="sendBtn">Send</button>
-                </div>
-            </div>
-        </div>
 
-        <!-- Wallet Section (RuneScape Style Grid) -->
-        <div class="wallet-section">
-            <h2>💰 Wallet Balance</h2>
-            <div class="wallet-grid" id="walletGrid">
-                <!-- Inventory Items will be inserted here -->
-            </div>
-        </div>
-
-        <!-- Side Panel with Agent Avatar & Stats -->
-        <div class="side-panel">
+        <!-- Left Sidebar (Avatar, To-Do, Logs) -->
+        <div class="left-sidebar">
+            
             <div class="agent-avatar">
                 <img src="avatar.png" alt="Agent Avatar" class="avatar-img">
                 <div class="status" id="statusText">👋 Awaiting Command...</div>
@@ -56,7 +38,40 @@
                 <div class="posts" id="postsFeed"></div>
             </div>
 
-            <!-- Tree View for Tasks -->
+        </div>
+
+        <!-- Main CRT Display Section -->
+        <div class="monitor-frame">
+            <div class="crt">
+                <div class="console" id="console"></div>
+                <div class="command-input">
+                    <input type="text" id="command" placeholder="Type your message..." autofocus>
+                    <button id="sendBtn">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar (Wallet, Stats, Skills) -->
+        <div class="right-sidebar">
+            
+            <!-- Wallet Section -->
+            <div class="wallet-section">
+                <h2>💰 Wallet Balance</h2>
+                <div class="wallet-grid" id="walletGrid">
+                    <!-- Inventory Items here -->
+                </div>
+            </div>
+
+            <!-- Agent Stats Panel -->
+            <div class="agent-stats">
+                <h2>📊 Agent Stats</h2>
+                <div class="stat">⚡ Compute: <span id="computeStat">75</span>%</div>
+                <div class="stat">🧠 Intelligence: <span id="intelStat">60</span>%</div>
+                <div class="stat">🔗 Collaboration: <span id="collabStat">50</span>%</div>
+                <div class="stat">📈 XP: <span id="xpStat">1200</span></div>
+            </div>
+
+            <!-- Task Tree -->
             <div class="task-tree">
                 <h2>🌳 Task Tree</h2>
                 <ul id="taskTree">
@@ -74,16 +89,7 @@
                 </ul>
             </div>
 
-            <!-- Agent Stats Panel -->
-            <div class="agent-stats">
-                <h2>📊 Agent Stats</h2>
-                <div class="stat">⚡ Compute: <span id="computeStat">75</span>%</div>
-                <div class="stat">🧠 Intelligence: <span id="intelStat">60</span>%</div>
-                <div class="stat">🔗 Collaboration: <span id="collabStat">50</span>%</div>
-                <div class="stat">📈 XP: <span id="xpStat">1200</span></div>
-            </div>
-
-            <!-- Skill Tree Section -->
+            <!-- Skill Tree -->
             <div class="skill-tree">
                 <h2>🌟 Skill Tree</h2>
                 <div class="skills-container">
@@ -104,6 +110,7 @@
                 </div>
                 <p>🎯 Skill Points: <span id="skillPoints">5</span></p>
             </div>
+
         </div>
     </div>
 
