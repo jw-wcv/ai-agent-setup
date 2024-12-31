@@ -159,50 +159,65 @@ async function greetUser(req, res) {
 
 
 
-
 async function handleCommand(req, res) {
     const { command } = req.body;
 
     if (!command) {
+        console.warn('⚠️ No command provided in request body.');
         return res.status(400).json({ error: 'No command provided' });
     }
 
     try {
+        console.log(`📩 Received command: "${command}"`);
+        
         const assistantId = await aiServices.ensureAssistant();
+        console.log(`✅ Assistant ensured: ${assistantId}`);
+        
         const threadId = await aiServices.getOrCreateThread(assistantId);
+        console.log(`🔗 Thread acquired (ID: ${threadId})`);
 
         // Add the user command to the thread
         await aiServices.addMessageToThread(threadId, command);
-        
+        console.log(`💬 Command added to thread ${threadId}`);
+
         // Run the thread and wait for the response
         await aiServices.runThread(threadId, assistantId);
-        
+        console.log(`🚀 Thread ${threadId} executed with assistant ${assistantId}`);
+
         // Get the latest messages from the thread
         let messages = await aiServices.getThreadMessages(threadId) || [];
-        console.log('Thread messages (raw):', messages);
+        console.log('🗨️ Raw thread messages:', messages);
 
         // Force messages to be an array regardless of format
         if (messages && typeof messages === 'object' && !Array.isArray(messages)) {
-            messages = messages.messages || messages.data || [];  // Handle different keys
+            console.log('🔍 Detected object response for messages. Extracting...');
+            messages = messages.messages || messages.data || [];
         }
 
         // Ensure messages is always an array
         messages = Array.isArray(messages) ? messages : [];
+        console.log(`📜 Final message list (count: ${messages.length}):`, messages);
 
+        // Filter out unnecessary greetings
         const filteredMessages = messages.filter(msg => 
             typeof msg === 'string' && !msg.includes("assist you today")
         );
+        console.log(`🧹 Filtered messages (count: ${filteredMessages.length}):`, filteredMessages);
 
+        // Determine latest message to return
         const latestMessage = filteredMessages.length > 0
             ? filteredMessages[filteredMessages.length - 1]
             : 'Command executed successfully.';
         
+        console.log(`📤 Returning response: "${latestMessage}"`);
         res.json({ status: 'success', result: latestMessage });
+
     } catch (error) {
-        console.error('Error processing command:', error);
+        console.error('❌ Error processing command:', error.message);
         res.status(500).json({ error: 'Failed to process command' });
     }
 }
+
 
 
 
