@@ -57,4 +57,33 @@
 }
 
 
+/* Responsive Grid Changes */
+@media (max-width: 1200px) {
+    .desk-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        height: auto;
+    }
 
+    .left-sidebar, .right-sidebar, .monitor-frame {
+        width: 100%;
+        height: auto;
+    }
+
+    .monitor-frame {
+        min-height: 50vh;
+    }
+}
+
+@media (max-width: 768px) {
+    .desk-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 10px;
+    }
+
+    .left-sidebar, .right-sidebar, .monitor-frame {
+        width: 100%;
+        height: auto;
+    }
+}
