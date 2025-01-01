@@ -1,4 +1,4 @@
-const { createOpenAIAgent } = require("@langchain/community/dist/agents");
+const { createOpenAIAgent } = require("@langchain/community/agents");
 const ServiceManager = require('../services/service_manager');
 const { openaiClient } = require('./aiConfig');
 
