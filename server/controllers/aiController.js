@@ -1,6 +1,24 @@
 // aiController.js
 
 const aiServices = require('../services/aiServices');
+const { processUserCommand } = require('../config/langchainConfig');
+
+// Langchain
+async function handleDynamicCommand(req, res) {
+    const { command } = req.body;
+
+    if (!command) {
+        return res.status(400).json({ error: 'No command provided' });
+    }
+
+    try {
+        const result = await processUserCommand(command);
+        res.json({ status: 'success', result });
+    } catch (error) {
+        console.error('❌ Error processing command:', error);
+        res.status(500).json({ error: 'Failed to execute service' });
+    }
+}
 
 // Create Assistant (Agent)
 async function createAgent(req, res) {
@@ -215,6 +233,7 @@ async function handleCommand(req, res) {
 
 
 module.exports = {
+    handleDynamicCommand,
     handleCommand,
     createAgent,
     listAssistants,

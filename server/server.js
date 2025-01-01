@@ -10,6 +10,7 @@ const { whitelistMiddleware } = require('./middleware/whitelistMiddleware');
 const aiRoutes = require('./routes/aiRoutes');  
 const databaseRoutes = require('./routes/dbRoutes');
 const agentRoutes = require('./routes/agentRoutes');
+const fileRoutes = require('./routes/fileRoutes');
 
 // Define models here 
 const ServiceManager = require('./services/service_manager.js');
@@ -47,6 +48,7 @@ app.get('*', (req, res) => {
 app.use('/api/database', databaseRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/agents', agentRoutes);
+app.use('/api/file', fileRoutes);
 
 // Real-time Log Streaming (syslog)
 app.get('/vm-log-stream', (req, res) => {

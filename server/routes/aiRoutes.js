@@ -31,5 +31,7 @@ router.post('/get-completion', aiController.getCompletion);
 router.get('/greet', aiController.greetUser);  
 router.post('/command', aiController.handleCommand);  
 
+router.post('/dynamic-command', aiController.handleDynamicCommand);
+
 
 module.exports = router;
