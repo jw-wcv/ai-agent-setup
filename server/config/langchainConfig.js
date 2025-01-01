@@ -1,30 +1,53 @@
-const { createOpenAIAgent } = require("@langchain/community/dist/agents");
+const { RunnableAgent } = require("@langchain/core/agents");
+const { AgentExecutor } = require("@langchain/core/runnables");
 const ServiceManager = require('../services/service_manager');
 const { openaiClient } = require('./aiConfig');
 
 const { ChatOpenAI } = require("@langchain/openai");
-const { DynamicTool } = require("@langchain/community/dist/tools");
+const { DynamicTool } = require("@langchain/community/tools");
 
 // Setup LangChain model using the shared AI client
 const model = new ChatOpenAI({
-    modelName: "gpt-4-turbo",
+    model: "gpt-4-turbo",
     openAIApiKey: openaiClient.apiKey  // Use API key from aiConfig
 });
 
-// Initialize Service Manager to dynamically load all services
-const serviceManager = new ServiceManager();
+// Improved Service Manager to dynamically load all services with caching and error handling
+class EnhancedServiceManager extends ServiceManager {
+    constructor() {
+        super();
+        this.toolCache = new Map();
+    }
+
+    getOrCreateTool(category, serviceName) {
+        const cacheKey = `${category}.${serviceName}`;
+        if (this.toolCache.has(cacheKey)) {
+            return this.toolCache.get(cacheKey);
+        }
+
+        const tool = new DynamicTool({
+            name: cacheKey,
+            description: `Executes the ${serviceName} service from ${category}.`,
+            func: async (parameters) => {
+                try {
+                    return await this.executeService(category, serviceName, parameters);
+                } catch (error) {
+                    console.error(`Error executing ${cacheKey}:`, error);
+                    throw new Error(`Failed to execute ${cacheKey}.`);
+                }
+            }
+        });
+
+        this.toolCache.set(cacheKey, tool);
+        return tool;
+    }
+}
+
+const serviceManager = new EnhancedServiceManager();
 
 // Create tools dynamically from services
 const tools = Object.entries(serviceManager.listAllServices()).flatMap(([category, services]) => {
-    return services.map((serviceName) => {
-        return new DynamicTool({
-            name: `${category}.${serviceName}`,
-            description: `Executes the ${serviceName} service from ${category}.`,
-            func: async (parameters) => {
-                return await serviceManager.executeService(category, serviceName, parameters);
-            }
-        });
-    });
+    return services.map((serviceName) => serviceManager.getOrCreateTool(category, serviceName));
 });
 
 // LangChain Agent Executor
@@ -32,10 +55,13 @@ let executor;
 
 async function initializeAgent() {
     if (!executor) {
-        executor = await createOpenAIAgent({
+        const agent = new RunnableAgent({
             tools,
             llm: model,
-            agentType: "zero-shot-react-description",  // Few-shot reasoning with descriptions
+            verbose: true
+        });
+        executor = new AgentExecutor({
+            agent,
             verbose: true
         });
         console.log("🔧 LangChain Agent Initialized");
