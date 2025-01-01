@@ -1,10 +1,9 @@
-const { ChatOpenAI } = require("langchain/chat_models/openai");
 const { initializeAgentExecutorWithOptions } = require("langchain/agents");
-const { DynamicTool } = require("langchain/tools");
-const ServiceManager = require('../services/serviceManager');
+const ServiceManager = require('../services/service_manager');
 const { openaiClient } = require('./aiConfig');
 
-
+const { ChatOpenAI } = require("@langchain/openai");
+const { DynamicTool } = require("@langchain/community/tools");
 // Setup LangChain model using the shared AI client
 const model = new ChatOpenAI({
     model: "gpt-4-turbo",
@@ -13,6 +12,7 @@ const model = new ChatOpenAI({
 
 // Initialize Service Manager to dynamically load all services
 const serviceManager = new ServiceManager();
+
 
 // Create tools dynamically from services
 const tools = Object.entries(serviceManager.listAllServices()).flatMap(([category, services]) => {
