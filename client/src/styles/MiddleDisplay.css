@@ -8,6 +8,9 @@
   color: #0f0;
   font-size: 18px;
   padding: 10px;
+  flex-grow: 1;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .command-input {
