@@ -1,9 +1,9 @@
-const { createOpenAIAgent } = require("@langchain/community/agents");
+const { createOpenAIAgent } = require("@langchain/community/dist/agents");
 const ServiceManager = require('../services/service_manager');
 const { openaiClient } = require('./aiConfig');
 
 const { ChatOpenAI } = require("@langchain/openai");
-const { DynamicTool } = require("@langchain/community/tools");
+const { DynamicTool } = require("@langchain/community/dist/tools");
 
 // Setup LangChain model using the shared AI client
 const model = new ChatOpenAI({
