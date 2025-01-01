@@ -1,30 +1,9 @@
 // aiServices.js
 
 require('dotenv').config();
-const { OpenAI } = require('openai');
-const fs = require('fs');
-const path = require('path');
 const AssistantModel = require('../database/models/Assistant');
 const AgentThread = require('../database/models/AgentThread');
-
-// Use CONFIG_DIR from .env or fallback to default
-const configPath = process.env.CONFIG_DIR || path.join(__dirname, '../../server/config');
-const keysPath = path.join(configPath, 'keys/api_key.txt');
-
-let apiKey;
-
-try {
-    apiKey = fs.readFileSync(keysPath, 'utf8').trim();
-    console.log('OpenAI API Key Loaded.');
-} catch (err) {
-    console.error('Failed to load OpenAI API Key:', err.message);
-    process.exit(1);
-}
-
-// Initialize OpenAI client
-const openaiClient = new OpenAI({
-    apiKey: apiKey
-});
+const { openaiClient } = require('../config/aiConfig');
 
 // Ensures assistant exists or creates one
 async function ensureAssistant() {
